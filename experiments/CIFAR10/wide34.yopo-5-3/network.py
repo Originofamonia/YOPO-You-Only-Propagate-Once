@@ -1,6 +1,6 @@
 import torch
 import config
-from lib.base_model.wide_resnet import WideResNet
+from base_model.wide_resnet import WideResNet
 
 
 def create_network():
