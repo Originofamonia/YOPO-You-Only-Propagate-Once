@@ -116,7 +116,7 @@ class IPGDAttackMethodMaker(object):
         # print(father_dir)
         if not father_dir in sys.path:
             sys.path.append(father_dir)
-        from lib.attack.pgd import IPGD
+        from attack.pgd import IPGD
         return IPGD(self.eps, self.sigma, self.nb_iters, self.norm, DEVICE, self.mean, self.std)
 
 

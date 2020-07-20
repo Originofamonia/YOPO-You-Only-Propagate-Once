@@ -14,13 +14,13 @@ if not father_dir in sys.path:
 
 def train_one_epoch(net, batch_generator, optimizer,
                     criterion, device,
-                    descrip_str='Training', AttackMethod=None, adv_coef=1.0):
-    '''
+                    descrip_str='Training', attack_method=None, adv_coef=1.0):
+    """
 
     :param attack_freq:  Frequencies of training with adversarial examples. -1 indicates natural training
-    :param AttackMethod: the attack method, None represents natural training
+    :param attack_method: the attack method, None represents natural training
     :return:  None    #(clean_acc, adv_acc)
-    '''
+    """
     net.train()
     pbar = tqdm(batch_generator)
     advacc = -1
@@ -36,8 +36,8 @@ def train_one_epoch(net, batch_generator, optimizer,
         pbar_dic = OrderedDict()
         TotalLoss = 0
 
-        if AttackMethod is not None:
-            adv_inp = AttackMethod.attack(net, data, label)
+        if attack_method is not None:
+            adv_inp = attack_method.attack(net, data, label)
             optimizer.zero_grad()
             net.train()
             pred = net(adv_inp)
