@@ -13,7 +13,7 @@ if not father_dir in sys.path:
 
 
 def train_one_epoch(net, batch_generator, optimizer,
-                    criterion, DEVICE=torch.device('cuda:0'),
+                    criterion, device,
                     descrip_str='Training', AttackMethod=None, adv_coef=1.0):
     '''
 
@@ -29,8 +29,7 @@ def train_one_epoch(net, batch_generator, optimizer,
     cleanloss = -1
     pbar.set_description(descrip_str)
     for i, (data, label) in enumerate(pbar):
-        data = data.to(DEVICE)
-        label = label.to(DEVICE)
+        data, label = data.to(device), label.to(device)
 
         optimizer.zero_grad()
 
@@ -71,7 +70,7 @@ def train_one_epoch(net, batch_generator, optimizer,
         pbar.set_postfix(pbar_dic)
 
 
-def eval_one_epoch(net, batch_generator, DEVICE=torch.device('cuda:0'), AttackMethod=None):
+def eval_one_epoch(net, batch_generator, device, attack_method=None):
     net.eval()
     pbar = tqdm(batch_generator)
     clean_accuracy = AvgMeter()
@@ -79,16 +78,15 @@ def eval_one_epoch(net, batch_generator, DEVICE=torch.device('cuda:0'), AttackMe
 
     pbar.set_description('Evaluating')
     for (data, label) in pbar:
-        data = data.to(DEVICE)
-        label = label.to(DEVICE)
+        data, label = data.to(device), label.to(device)
 
         with torch.no_grad():
             pred = net(data)
             acc = torch_accuracy(pred, label, (1,))
             clean_accuracy.update(acc[0].item())
 
-        if AttackMethod is not None:
-            adv_inp = AttackMethod.attack(net, data, label)
+        if attack_method is not None:
+            adv_inp = attack_method.attack(net, data, label)
 
             with torch.no_grad():
                 pred = net(adv_inp)
@@ -101,5 +99,5 @@ def eval_one_epoch(net, batch_generator, DEVICE=torch.device('cuda:0'), AttackMe
 
         pbar.set_postfix(pbar_dic)
 
-        adv_acc = adv_accuracy.mean if AttackMethod is not None else 0
+        adv_acc = adv_accuracy.mean if attack_method is not None else 0
     return clean_accuracy.mean, adv_acc

@@ -18,20 +18,20 @@ parser.add_argument('-d', type=int, default=0, help='Which gpu to use')
 args = parser.parse_args()
 
 
-DEVICE = torch.device('cuda:{}'.format(args.d))
+device = torch.device('cuda:{}'.format(args.d))
 torch.backends.cudnn.benchmark = True
 
 net = create_network()
-net.to(DEVICE)
+net.to(device)
 
 ds_val = create_test_dataset(512)
 
-AttackMethod = config.create_evaluation_attack_method(DEVICE)
+AttackMethod = config.create_evaluation_attack_method(device)
 
 if os.path.isfile(args.resume):
     load_checkpoint(args.resume, net)
 
 
 print('Evaluating')
-clean_acc, adv_acc = eval_one_epoch(net, ds_val, DEVICE, AttackMethod)
+clean_acc, adv_acc = eval_one_epoch(net, ds_val, device, AttackMethod)
 print('clean acc -- {}     adv acc -- {}'.format(clean_acc, adv_acc))
