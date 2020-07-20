@@ -4,9 +4,6 @@ import os
 import argparse
 import numpy as np
 import torch
-from loss import CrossEntropyWithWeightPenlty
-from lib.training.config import TrainingConfigBase, SGDOptimizerMaker, \
-    PieceWiseConstantLrSchedulerMaker, IPGDAttackMethodMaker
 
 
 def add_path(path):
@@ -20,8 +17,12 @@ root_path = os.path.join('/', *abs_current_path.split(os.path.sep)[:-3])
 lib_dir = os.path.join(root_path, 'lib')
 add_path(lib_dir)
 
+# from loss import CrossEntropyWithWeightPenlty
+from training.config import TrainingConfigBase, SGDOptimizerMaker, \
+    PieceWiseConstantLrSchedulerMaker, IPGDAttackMethodMaker
 
-class TrainingConfing(TrainingConfigBase):
+
+class TrainingConfig(TrainingConfigBase):
     lib_dir = lib_dir
 
     num_epochs = 36
@@ -51,7 +52,7 @@ class TrainingConfing(TrainingConfigBase):
                               std=torch.tensor(np.array([1]).astype(np.float32)[np.newaxis, :, np.newaxis, np.newaxis]))
 
 
-config = TrainingConfing()
+config = TrainingConfig()
 
 # About data
 # C.inp_chn = 1
@@ -61,7 +62,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument('--resume', default=None, type=str, metavar='PATH',
                     help='path to latest checkpoint (default: none)')
-parser.add_argument('-b', '--batch_size', default=10, type=int,
+parser.add_argument('-b', '--batch_size', default=100, type=int,
                     metavar='N', help='mini-batch size')
 parser.add_argument('-d', type=int, default=0, help='Which gpu to use')
 parser.add_argument('-adv_coef', default=1.0, type=float,
