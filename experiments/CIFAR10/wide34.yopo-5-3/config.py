@@ -39,10 +39,6 @@ class TrainingConfig(TrainingConfigBase):
 
     create_loss_function = torch.nn.CrossEntropyLoss
 
-    # create_attack_method = \
-    #    IPGDAttackMethodMaker(eps = 8/255.0, sigma = 2/255.0, nb_iters = 10, norm = np.inf,
-    #                          mean = torch.tensor(np.array([0]).astype(np.float32)[np.newaxis, :, np.newaxis, np.newaxis]),
-    #                          std = torch.tensor(np.array([1]).astype(np.float32)[np.newaxis, :, np.newaxis, np.newaxis]))
     create_attack_method = None
 
     create_evaluation_attack_method = \
@@ -53,10 +49,6 @@ class TrainingConfig(TrainingConfigBase):
 
 
 config = TrainingConfig()
-
-# About data
-# C.inp_chn = 1
-# C.num_class = 10
 
 parser = argparse.ArgumentParser()
 

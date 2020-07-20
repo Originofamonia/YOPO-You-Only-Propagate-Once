@@ -37,11 +37,11 @@ def main():
     # Make Layer One trainner  This part of code should be writen in config.py
 
     Hamiltonian_func = Hamiltonian(net.layer_one, config.weight_decay)
-    layer_one_optimizer = optim.SGD(net.layer_one.parameters(), lr=lr_scheduler.get_last_lr()[0], momentum=0.9,
-                                    weight_decay=5e-4)
-    lyaer_one_optimizer_lr_scheduler = optim.lr_scheduler.MultiStepLR(layer_one_optimizer,
-                                                                      milestones=[30, 34, 36], gamma=0.1)
-    LayerOneTrainer = FastGradientLayerOneTrainer(Hamiltonian_func, layer_one_optimizer,
+    layer_1_optimizer = optim.SGD(net.layer_one.parameters(), lr=lr_scheduler.get_last_lr()[0], momentum=0.9,
+                                  weight_decay=5e-4)
+    layer_1_optimizer_lr_scheduler = optim.lr_scheduler.MultiStepLR(layer_1_optimizer,
+                                                                    milestones=[30, 34, 36], gamma=0.1)
+    layer_1_trainer = FastGradientLayerOneTrainer(Hamiltonian_func, layer_1_optimizer,
                                                   config.inner_iters, config.sigma, config.eps)
 
     ds_train = create_train_dataset(args.batch_size)
@@ -64,7 +64,7 @@ def main():
 
         descrip_str = 'Training epoch:{}/{} -- lr:{}'.format(now_epoch, config.num_epochs,
                                                              lr_scheduler.get_last_lr()[0])
-        acc, yofoacc = train_one_epoch(net, ds_train, optimizer, criterion, LayerOneTrainer, config.K,
+        acc, yofoacc = train_one_epoch(net, ds_train, optimizer, criterion, layer_1_trainer, config.K,
                                        device, descrip_str)
         tb_train_dic = {'Acc': acc, 'YofoAcc': yofoacc}
         print(tb_train_dic)
@@ -75,7 +75,7 @@ def main():
             writer.add_scalars('Val', tb_val_dic, now_epoch)
 
         lr_scheduler.step()
-        lyaer_one_optimizer_lr_scheduler.step()
+        layer_1_optimizer_lr_scheduler.step()
 
     save_checkpoint(now_epoch, net, optimizer, lr_scheduler,
                     file_name=os.path.join(config.model_dir, 'epoch-{}.checkpoint'.format(now_epoch)))
