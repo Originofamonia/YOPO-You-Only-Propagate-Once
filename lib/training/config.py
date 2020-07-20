@@ -6,9 +6,9 @@ import torch
 
 
 class TrainingConfigBase(metaclass=ABCMeta):
-    '''
+    """
     Base class for training
-    '''
+    """
 
     # directory handling
     @property
@@ -25,7 +25,7 @@ class TrainingConfigBase(metaclass=ABCMeta):
     def model_dir(self):
         log_dir = self.log_dir
         model_dir = os.path.join(log_dir, 'models')
-        #print(model_dir)
+        # print(model_dir)
         if not os.path.exists(model_dir):
             os.mkdir(model_dir)
         return model_dir
@@ -49,43 +49,40 @@ class TrainingConfigBase(metaclass=ABCMeta):
 
     @abstractmethod
     def create_optimizer(self, params) -> torch.optim.Optimizer:
-        '''
+        """
         params (iterable): iterable of parameters to optimize or dicts defining
                            parameter groups
-        '''
+        """
         pass
 
     @abstractmethod
-    def create_lr_scheduler(self, optimizer:torch.optim.Optimizer) -> torch.optim.lr_scheduler._LRScheduler:
+    def create_lr_scheduler(self, optimizer: torch.optim.Optimizer) -> torch.optim.lr_scheduler._LRScheduler:
         pass
 
     @abstractmethod
     def create_loss_function(self) -> torch.nn.modules.loss._Loss:
         pass
 
-
     def create_attack_method(self, *inputs):
-        '''
+        """
         Perform adversarial training against xxx adversary
         Return None means natural training
-        '''
+        """
         return None
 
     # Evaluation Setting
 
     def create_evaluation_attack_method(self, *inputs):
-        '''
+        """
         evaluating the robustness of model against xxx adversary
         Return None means only measuring clean accuracy
-        '''
+        """
         return None
-
-
 
 
 class SGDOptimizerMaker(object):
 
-    def __init__(self, lr = 0.1, momentum = 0.9, weight_decay = 1e-4):
+    def __init__(self, lr=0.1, momentum=0.9, weight_decay=1e-4):
         self.lr = lr
         self.momentum = momentum
         self.weight_decay = weight_decay
@@ -96,12 +93,13 @@ class SGDOptimizerMaker(object):
 
 class PieceWiseConstantLrSchedulerMaker(object):
 
-    def __init__(self, milestones:List[int], gamma:float = 0.1):
+    def __init__(self, milestones: List[int], gamma: float = 0.1):
         self.milestones = milestones
         self.gamma = gamma
 
     def __call__(self, optimizer):
         return torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=self.milestones, gamma=self.gamma)
+
 
 class IPGDAttackMethodMaker(object):
 
@@ -118,13 +116,13 @@ class IPGDAttackMethodMaker(object):
         # print(father_dir)
         if not father_dir in sys.path:
             sys.path.append(father_dir)
-        from attack.pgd import IPGD
+        from lib.attack.pgd import IPGD
         return IPGD(self.eps, self.sigma, self.nb_iters, self.norm, DEVICE, self.mean, self.std)
+
 
 class LambdaLrSchedulerMaker(object):
 
-
-    def __init__(self, func, last_epoch = -1):
+    def __init__(self, func, last_epoch=-1):
         assert callable(func)
 
         self.func = func

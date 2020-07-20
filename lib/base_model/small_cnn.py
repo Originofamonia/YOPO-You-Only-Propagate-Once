@@ -1,4 +1,4 @@
-'''
+"""
 this code is from https://github.com/yaodongyu/TRADES/blob/master/models/small_cnn.py
 @article{Zhang2019theoretically,
 	author = {Hongyang Zhang and Yaodong Yu and Jiantao Jiao and Eric P. Xing and Laurent El Ghaoui and Michael I. Jordan},
@@ -6,7 +6,7 @@ this code is from https://github.com/yaodongyu/TRADES/blob/master/models/small_c
 	journal = {arXiv preprint arXiv:1901.08573},
 	year = {2019}
 }
-'''
+"""
 from collections import OrderedDict
 import torch.nn as nn
 
@@ -22,8 +22,7 @@ class SmallCNN(nn.Module):
         self.conv1 = nn.Conv2d(self.num_channels, 32, 3)
         self.layer_one = nn.Sequential(OrderedDict([
             ('conv1', self.conv1),
-            ('relu1', activ),]))
-
+            ('relu1', activ), ]))
 
         self.feature_extractor = nn.Sequential(OrderedDict([
             ('conv2', nn.Conv2d(32, 32, 3)),
@@ -67,6 +66,7 @@ class SmallCNN(nn.Module):
         features = self.feature_extractor(y)
         logits = self.classifier(features.view(-1, 64 * 4 * 4))
         return logits
+
 
 def create_network():
     return SmallCNN()

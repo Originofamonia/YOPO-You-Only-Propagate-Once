@@ -1,12 +1,15 @@
 import math
 import os
+import sys
+import json
 from typing import Tuple, List, Dict
 import torch
 
+
 def torch_accuracy(output, target, topk=(1,)) -> List[torch.Tensor]:
-    '''
+    """
     param output, target: should be torch Variable
-    '''
+    """
     # assert isinstance(output, torch.cuda.Tensor), 'expecting Torch Tensor'
     # assert isinstance(target, torch.Tensor), 'expecting Torch Tensor'
     # print(type(output))
@@ -26,10 +29,11 @@ def torch_accuracy(output, target, topk=(1,)) -> List[torch.Tensor]:
 
     return ans
 
+
 class AvgMeter(object):
-    '''
+    """
     Computing mean
-    '''
+    """
     name = 'No name'
 
     def __init__(self, name='No name'):
@@ -52,14 +56,15 @@ class AvgMeter(object):
         self.sum += mean_var * count
         self.mean = float(self.sum) / self.num
 
-def save_args(args, save_dir = None):
-    if save_dir == None:
+
+def save_args(args, save_dir=None):
+    if save_dir is None:
         param_path = os.path.join(args.resume, "params.json")
     else:
         param_path = os.path.join(save_dir, 'params.json')
 
-    #logger.info("[*] MODEL dir: %s" % args.resume)
-    #logger.info("[*] PARAM path: %s" % param_path)
+    # logger.info("[*] MODEL dir: %s" % args.resume)
+    # logger.info("[*] PARAM path: %s" % param_path)
 
     with open(param_path, 'w') as fp:
         json.dump(args.__dict__, fp, indent=4, sort_keys=True)
@@ -70,19 +75,21 @@ def mkdir(path):
         print('creating dir {}'.format(path))
         os.mkdir(path)
 
+
 def save_checkpoint(now_epoch, net, optimizer, lr_scheduler, file_name):
     checkpoint = {'epoch': now_epoch,
                   'state_dict': net.state_dict(),
                   'optimizer_state_dict': optimizer.state_dict(),
-                  'lr_scheduler_state_dict':lr_scheduler.state_dict()}
+                  'lr_scheduler_state_dict': lr_scheduler.state_dict()}
     if os.path.exists(file_name):
         print('Overwriting {}'.format(file_name))
     torch.save(checkpoint, file_name)
     link_name = os.path.join('/', *file_name.split(os.path.sep)[:-1], 'last.checkpoint')
-    #print(link_name)
-    make_symlink(source = file_name, link_name=link_name)
+    # print(link_name)
+    make_symlink(source=file_name, link_name=link_name)
 
-def load_checkpoint(file_name, net = None, optimizer = None, lr_scheduler = None):
+
+def load_checkpoint(file_name, net=None, optimizer=None, lr_scheduler=None):
     if os.path.isfile(file_name):
         print("=> loading checkpoint '{}'".format(file_name))
         check_point = torch.load(file_name)
@@ -102,18 +109,19 @@ def load_checkpoint(file_name, net = None, optimizer = None, lr_scheduler = None
 
 
 def make_symlink(source, link_name):
-    '''
+    """
     Note: overwriting enabled!
-    '''
+    """
     if os.path.exists(link_name):
-        #print("Link name already exist! Removing '{}' and overwriting".format(link_name))
+        # print("Link name already exist! Removing '{}' and overwriting".format(link_name))
         os.remove(link_name)
     if os.path.exists(source):
         os.symlink(source, link_name)
         return
     else:
         print('Source path not exists')
-    #print('SymLink Wrong!')
+    # print('SymLink Wrong!')
+
 
 def add_path(path):
     if path not in sys.path:

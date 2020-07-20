@@ -15,7 +15,8 @@ import math
 
 class BasicBlock(nn.Module):
 
-    def __init__(self, in_planes, out_planes, stride, dropRate=0.0):
+    def __init__(self, in_planes, out_planes, stride, drop_rate=0.0):
+
         super(BasicBlock, self).__init__()
         self.bn1 = nn.BatchNorm2d(in_planes)
         self.relu1 = nn.ReLU(inplace=True)
@@ -25,7 +26,7 @@ class BasicBlock(nn.Module):
         self.relu2 = nn.ReLU(inplace=True)
         self.conv2 = nn.Conv2d(out_planes, out_planes, kernel_size=3, stride=1,
                                padding=1, bias=False)
-        self.droprate = dropRate
+        self.droprate = drop_rate
         self.equalInOut = (in_planes == out_planes)
         self.convShortcut = (not self.equalInOut) and nn.Conv2d(in_planes, out_planes, kernel_size=1, stride=stride,
                                                                 padding=0, bias=False) or None
@@ -43,14 +44,14 @@ class BasicBlock(nn.Module):
 
 
 class NetworkBlock(nn.Module):
-    def __init__(self, nb_layers, in_planes, out_planes, block, stride, dropRate=0.0):
+    def __init__(self, nb_layers, in_planes, out_planes, block, stride, drop_rate=0.0):
         super(NetworkBlock, self).__init__()
-        self.layer = self._make_layer(block, in_planes, out_planes, nb_layers, stride, dropRate)
+        self.layer = self._make_layer(block, in_planes, out_planes, nb_layers, stride, drop_rate)
 
-    def _make_layer(self, block, in_planes, out_planes, nb_layers, stride, dropRate):
+    def _make_layer(self, block, in_planes, out_planes, nb_layers, stride, drop_rate):
         layers = []
         for i in range(int(nb_layers)):
-            layers.append(block(i == 0 and in_planes or out_planes, out_planes, i == 0 and stride or 1, dropRate))
+            layers.append(block(i == 0 and in_planes or out_planes, out_planes, i == 0 and stride or 1, drop_rate))
         return nn.Sequential(*layers)
 
     def forward(self, x):
@@ -58,37 +59,37 @@ class NetworkBlock(nn.Module):
 
 
 class WideResNet(nn.Module):
-    def __init__(self, depth=28, num_classes=10, widen_factor=10, dropRate=0.0):
+    def __init__(self, depth=28, num_classes=10, widen_factor=10, drop_rate=0.3):
         super(WideResNet, self).__init__()
-        nChannels = [16, 16 * widen_factor, 32 * widen_factor, 64 * widen_factor]
+        n_channels = [16, 16 * widen_factor, 32 * widen_factor, 64 * widen_factor]
         assert ((depth - 4) % 6 == 0)
         n = (depth - 4) / 6
         block = BasicBlock
         # 1st conv before any network block
-        self.conv1 = nn.Conv2d(3, nChannels[0], kernel_size=3, stride=1,
+        self.conv1 = nn.Conv2d(3, n_channels[0], kernel_size=3, stride=1,
                                padding=1, bias=False)
         self.layer_one = self.conv1
 
         self.other_layers = nn.ModuleList()
         # 1st block
-        self.block1 = NetworkBlock(n, nChannels[0], nChannels[1], block, 1, dropRate)
+        self.block1 = NetworkBlock(n, n_channels[0], n_channels[1], block, 1, drop_rate)
         self.other_layers.append(self.block1)
         # 1st sub-block
-        self.sub_block1 = NetworkBlock(n, nChannels[0], nChannels[1], block, 1, dropRate)
+        self.sub_block1 = NetworkBlock(n, n_channels[0], n_channels[1], block, 1, drop_rate)
         self.other_layers.append(self.sub_block1)
         # 2nd block
-        self.block2 = NetworkBlock(n, nChannels[1], nChannels[2], block, 2, dropRate)
+        self.block2 = NetworkBlock(n, n_channels[1], n_channels[2], block, 2, drop_rate)
         self.other_layers.append(self.block2)
         # 3rd block
-        self.block3 = NetworkBlock(n, nChannels[2], nChannels[3], block, 2, dropRate)
+        self.block3 = NetworkBlock(n, n_channels[2], n_channels[3], block, 2, drop_rate)
         self.other_layers.append(self.block3)
         # global average pooling and classifier
-        self.bn1 = nn.BatchNorm2d(nChannels[3])
+        self.bn1 = nn.BatchNorm2d(n_channels[3])
         self.other_layers.append(self.bn1)
         self.relu = nn.ReLU(inplace=True)
-        self.fc = nn.Linear(nChannels[3], num_classes)
+        self.fc = nn.Linear(n_channels[3], num_classes)
         self.other_layers.append(self.fc)
-        self.nChannels = nChannels[3]
+        self.nChannels = n_channels[3]
 
         '''
         for m in self.modules():

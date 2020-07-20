@@ -1,17 +1,20 @@
 import os
 import sys
-father_dir = os.path.join('/',  *os.path.realpath(__file__).split(os.path.sep)[:-2])
-#print(father_dir)
-if not father_dir in sys.path:
-    sys.path.append(father_dir)
-from utils.misc import torch_accuracy, AvgMeter
+
+from lib.utils.misc import torch_accuracy, AvgMeter
 from collections import OrderedDict
 import torch
 from tqdm import tqdm
 
+father_dir = os.path.join('/', *os.path.realpath(__file__).split(os.path.sep)[:-2])
+# print(father_dir)
+if not father_dir in sys.path:
+    sys.path.append(father_dir)
+
+
 def train_one_epoch(net, batch_generator, optimizer,
                     criterion, DEVICE=torch.device('cuda:0'),
-                    descrip_str='Training', AttackMethod = None, adv_coef = 1.0):
+                    descrip_str='Training', AttackMethod=None, adv_coef=1.0):
     '''
 
     :param attack_freq:  Frequencies of training with adversarial examples. -1 indicates natural training
@@ -44,24 +47,23 @@ def train_one_epoch(net, batch_generator, optimizer,
             acc = torch_accuracy(pred, label, (1,))
             advacc = acc[0].item()
             advloss = loss.item()
-            #TotalLoss = TotalLoss + loss * adv_coef
+            # TotalLoss = TotalLoss + loss * adv_coef
             (loss * adv_coef).backward()
-
 
         pred = net(data)
 
         loss = criterion(pred, label)
-        #TotalLoss = TotalLoss + loss
+        # TotalLoss = TotalLoss + loss
         loss.backward()
-        #TotalLoss.backward()
-        #param = next(net.parameters())
-        #grad_mean = torch.mean(param.grad)
+        # TotalLoss.backward()
+        # param = next(net.parameters())
+        # grad_mean = torch.mean(param.grad)
 
         optimizer.step()
         acc = torch_accuracy(pred, label, (1,))
         cleanacc = acc[0].item()
         cleanloss = loss.item()
-        #pbar_dic['grad'] = '{}'.format(grad_mean)
+        # pbar_dic['grad'] = '{}'.format(grad_mean)
         pbar_dic['Acc'] = '{:.2f}'.format(cleanacc)
         pbar_dic['loss'] = '{:.2f}'.format(cleanloss)
         pbar_dic['AdvAcc'] = '{:.2f}'.format(advacc)
@@ -69,7 +71,7 @@ def train_one_epoch(net, batch_generator, optimizer,
         pbar.set_postfix(pbar_dic)
 
 
-def eval_one_epoch(net, batch_generator,  DEVICE=torch.device('cuda:0'), AttackMethod = None):
+def eval_one_epoch(net, batch_generator, DEVICE=torch.device('cuda:0'), AttackMethod=None):
     net.eval()
     pbar = tqdm(batch_generator)
     clean_accuracy = AvgMeter()

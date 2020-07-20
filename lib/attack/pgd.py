@@ -8,10 +8,13 @@ import torch
 import numpy as np
 import os
 import sys
+
+from lib.attack.attack_base import AttackBase, clip_eta
+
 father_dir = os.path.join('/', *os.path.realpath(__file__).split(os.path.sep)[:-2])
 if not father_dir in sys.path:
     sys.path.append(father_dir)
-from attack.attack_base import AttackBase, clip_eta
+
 
 class IPGD(AttackBase):
     # ImageNet pre-trained mean and std
@@ -20,10 +23,11 @@ class IPGD(AttackBase):
 
     # _mean = torch.tensor(np.array([0]).astype(np.float32)[np.newaxis, :, np.newaxis, np.newaxis])
     # _std = torch.tensor(np.array([1.0]).astype(np.float32)[np.newaxis, :, np.newaxis, np.newaxis])
-    def __init__(self, eps = 6 / 255.0, sigma = 3 / 255.0, nb_iter = 20,
-                 norm = np.inf, DEVICE = torch.device('cpu'),
-                 mean = torch.tensor(np.array([0]).astype(np.float32)[np.newaxis, :, np.newaxis, np.newaxis]),
-                 std = torch.tensor(np.array([1.0]).astype(np.float32)[np.newaxis, :, np.newaxis, np.newaxis]), random_start = True):
+    def __init__(self, eps=6 / 255.0, sigma=3 / 255.0, nb_iter=20,
+                 norm=np.inf, DEVICE=torch.device('cpu'),
+                 mean=torch.tensor(np.array([0]).astype(np.float32)[np.newaxis, :, np.newaxis, np.newaxis]),
+                 std=torch.tensor(np.array([1.0]).astype(np.float32)[np.newaxis, :, np.newaxis, np.newaxis]),
+                 random_start=True):
         '''
         :param eps: maximum distortion of adversarial examples
         :param sigma: single step size
@@ -40,7 +44,7 @@ class IPGD(AttackBase):
         self._std = std.to(DEVICE)
         self.random_start = random_start
 
-    def single_attack(self, net, inp, label, eta, target = None):
+    def single_attack(self, net, inp, label, eta, target=None):
         '''
         Given the original image and the perturbation computed so far, computes
         a new perturbation.
@@ -53,32 +57,32 @@ class IPGD(AttackBase):
 
         adv_inp = inp + eta
 
-        #net.zero_grad()
+        # net.zero_grad()
 
         pred = net(adv_inp)
         if target is not None:
             targets = torch.sum(pred[:, target])
-            grad_sign = torch.autograd.grad(targets, adv_in, only_inputs=True, retain_graph = False)[0].sign()
+            grad_sign = torch.autograd.grad(targets, adv_in, only_inputs=True, retain_graph=False)[0].sign()
 
         else:
             loss = self.criterion(pred, label)
             grad_sign = torch.autograd.grad(loss, adv_inp,
-                                            only_inputs=True, retain_graph = False)[0].sign()
+                                            only_inputs=True, retain_graph=False)[0].sign()
 
         adv_inp = adv_inp + grad_sign * (self.sigma / self._std)
-        tmp_adv_inp = adv_inp * self._std +  self._mean
+        tmp_adv_inp = adv_inp * self._std + self._mean
 
         tmp_inp = inp * self._std + self._mean
-        tmp_adv_inp = torch.clamp(tmp_adv_inp, 0, 1) ## clip into 0-1
-        #tmp_adv_inp = (tmp_adv_inp - self._mean) / self._std
+        tmp_adv_inp = torch.clamp(tmp_adv_inp, 0, 1)  ## clip into 0-1
+        # tmp_adv_inp = (tmp_adv_inp - self._mean) / self._std
         tmp_eta = tmp_adv_inp - tmp_inp
         tmp_eta = clip_eta(tmp_eta, norm=self.norm, eps=self.eps, DEVICE=self.DEVICE)
 
-        eta = tmp_eta/ self._std
+        eta = tmp_eta / self._std
 
         return eta
 
-    def attack(self, net, inp, label, target = None):
+    def attack(self, net, inp, label, target=None):
 
         if self.random_start:
             eta = torch.FloatTensor(*inp.shape).uniform_(-self.eps, self.eps)
@@ -92,11 +96,11 @@ class IPGD(AttackBase):
         eta.requires_grad = True
         for i in range(self.nb_iter):
             eta = self.single_attack(net, inp, label, eta, target)
-            #print(i)
+            # print(i)
 
-        #print(eta.max())
+        # print(eta.max())
         adv_inp = inp + eta
-        tmp_adv_inp = adv_inp * self._std +  self._mean
+        tmp_adv_inp = adv_inp * self._std + self._mean
         tmp_adv_inp = torch.clamp(tmp_adv_inp, 0, 1)
         adv_inp = (tmp_adv_inp - self._mean) / self._std
 
@@ -108,7 +112,10 @@ class IPGD(AttackBase):
         self._std = self._std.to(device)
         self.criterion = self.criterion.to(device)
 
+
 def test_IPGD():
     pass
+
+
 if __name__ == '__main__':
     test_IPGD()
