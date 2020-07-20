@@ -1,7 +1,7 @@
 import os
 import sys
 
-from lib.utils.misc import torch_accuracy, AvgMeter
+from utils.misc import torch_accuracy, AvgMeter
 from collections import OrderedDict
 import torch
 from tqdm import tqdm
