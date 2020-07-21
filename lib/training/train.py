@@ -12,11 +12,9 @@ if father_dir not in sys.path:
     sys.path.append(father_dir)
 
 
-def train_one_epoch(net, batch_generator, optimizer,
-                    criterion, device,
+def train_one_epoch(net, batch_generator, optimizer, criterion, device,
                     descrip_str='Training', attack_method=None, adv_coef=1.0):
     """
-
     :param attack_freq:  Frequencies of training with adversarial examples. -1 indicates natural training
     :param attack_method: the attack method, None represents natural training
     :return:  None    #(clean_acc, adv_acc)

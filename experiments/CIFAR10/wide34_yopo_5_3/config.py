@@ -4,6 +4,7 @@ import os
 import argparse
 import numpy as np
 import torch
+import torch.nn as nn
 
 # from loss import CrossEntropyWithWeightPenalty
 from lib.training.config import TrainingConfigBase, SGDOptimizerMaker, \
@@ -27,7 +28,7 @@ class TrainingConfig(TrainingConfigBase):
     create_optimizer = SGDOptimizerMaker(lr=1e-1 * 4 / K, momentum=0.9, weight_decay=5e-4)
     create_lr_scheduler = PieceWiseConstantLrSchedulerMaker(milestones=[30, 34, 36], gamma=0.1)
 
-    create_loss_function = torch.nn.CrossEntropyLoss
+    create_loss_function = nn.CrossEntropyLoss()
 
     create_attack_method = None
 

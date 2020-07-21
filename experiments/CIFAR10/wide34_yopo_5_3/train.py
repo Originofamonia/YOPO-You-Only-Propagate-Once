@@ -1,7 +1,7 @@
 import torch
 import sys
 # import numpy as np
-from tensorboardX import SummaryWriter
+# from tensorboardX import SummaryWriter
 # import argparse
 # import torch.nn as nn
 import torch.optim as optim
@@ -35,12 +35,12 @@ def main():
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     torch.backends.cudnn.benchmark = True
 
-    writer = SummaryWriter(log_dir=config.log_dir)
+    # writer = SummaryWriter(log_dir=config.log_dir)
 
     net = create_network()
     net.to(device)
     criterion = config.create_loss_function().to(device)
-    # criterion = CrossEntropyWithWeightPenlty(net.other_layers, DEVICE, config.weight_decay)#.to(DEVICE)
+    # criterion = CrossEntropyWithWeightPenalty(net.other_layers, DEVICE, config.weight_decay)#.to(DEVICE)
     # ce_criterion = nn.CrossEntropyLoss().to(DEVICE)
     optimizer = config.create_optimizer(net.other_layers.parameters())
     lr_scheduler = config.create_lr_scheduler(optimizer)
@@ -69,9 +69,6 @@ def main():
         now_epoch = load_checkpoint(args.resume, net, optimizer, lr_scheduler)
 
     for i in range(now_epoch, config.num_epochs):
-        # if now_epoch > config.num_epochs:
-        #     break
-        # now_epoch = now_epoch + 1
 
         descrip_str = 'Training epoch:{}/{} -- lr:{}'.format(i, config.num_epochs,
                                                              lr_scheduler.get_last_lr()[0])
@@ -79,11 +76,11 @@ def main():
                                        device, descrip_str)
         tb_train_dic = {'Acc': acc, 'YofoAcc': yofoacc}
         print(tb_train_dic)
-        writer.add_scalars('Train', tb_train_dic, i)
+
         if config.eval_interval > 0 and i % config.eval_interval == 0:
             acc, advacc = eval_one_epoch(net, ds_val, device, eval_attack)
             tb_val_dic = {'Acc': acc, 'AdvAcc': advacc}
-            writer.add_scalars('Val', tb_val_dic, i)
+            print(tb_val_dic)
 
         lr_scheduler.step()
         layer_1_optimizer_lr_scheduler.step()
