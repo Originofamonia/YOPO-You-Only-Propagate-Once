@@ -20,7 +20,6 @@ from collections import OrderedDict
 
 
 def main():
-    # DEVICE = torch.device('cuda:{}'.format(args.d))
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     torch.backends.cudnn.benchmark = True
 
@@ -34,14 +33,14 @@ def main():
     optimizer = config.create_optimizer(net.other_layers.parameters())
     lr_scheduler = config.create_lr_scheduler(optimizer)
 
-    # Make Layer One trainner  This part of code should be writen in config.py
+    # Make Layer One trainer  This part of code should be writen in config.py
 
-    Hamiltonian_func = Hamiltonian(net.layer_one, config.weight_decay)
+    hamiltonian_func = Hamiltonian(net.layer_one, config.weight_decay)
     layer_1_optimizer = optim.SGD(net.layer_one.parameters(), lr=lr_scheduler.get_last_lr()[0], momentum=0.9,
                                   weight_decay=5e-4)
     layer_1_optimizer_lr_scheduler = optim.lr_scheduler.MultiStepLR(layer_1_optimizer,
                                                                     milestones=[30, 34, 36], gamma=0.1)
-    layer_1_trainer = FastGradientLayerOneTrainer(Hamiltonian_func, layer_1_optimizer,
+    layer_1_trainer = FastGradientLayerOneTrainer(hamiltonian_func, layer_1_optimizer,
                                                   config.inner_iters, config.sigma, config.eps)
 
     ds_train = create_train_dataset(args.batch_size)

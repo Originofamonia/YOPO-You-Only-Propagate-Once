@@ -16,9 +16,10 @@ abs_current_path = os.path.realpath('./')
 root_path = os.path.join('/', *abs_current_path.split(os.path.sep)[:-3])
 lib_dir = os.path.join(root_path, 'lib')
 add_path(lib_dir)
+add_path(root_path)
 
 # from loss import CrossEntropyWithWeightPenlty
-from training.config import TrainingConfigBase, SGDOptimizerMaker, \
+from lib.training.config import TrainingConfigBase, SGDOptimizerMaker, \
     PieceWiseConstantLrSchedulerMaker, IPGDAttackMethodMaker
 
 

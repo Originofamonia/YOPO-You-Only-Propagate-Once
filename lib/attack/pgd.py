@@ -24,7 +24,7 @@ class IPGD(AttackBase):
     # _mean = torch.tensor(np.array([0]).astype(np.float32)[np.newaxis, :, np.newaxis, np.newaxis])
     # _std = torch.tensor(np.array([1.0]).astype(np.float32)[np.newaxis, :, np.newaxis, np.newaxis])
     def __init__(self, eps=6 / 255.0, sigma=3 / 255.0, nb_iter=20,
-                 norm=np.inf, device=torch.device('cuda'),
+                 norm=np.inf, device='cuda',
                  mean=torch.tensor(np.array([0]).astype(np.float32)[np.newaxis, :, np.newaxis, np.newaxis]),
                  std=torch.tensor(np.array([1.0]).astype(np.float32)[np.newaxis, :, np.newaxis, np.newaxis]),
                  random_start=True):
@@ -52,6 +52,7 @@ class IPGD(AttackBase):
         :param inp: original image
         :param label:
         :param eta: perturbation computed so far
+        :param target:
         :return: a new perturbation
         """
 
