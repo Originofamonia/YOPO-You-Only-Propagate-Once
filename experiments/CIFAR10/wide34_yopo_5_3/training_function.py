@@ -1,13 +1,12 @@
 import torch
 import torch.nn as nn
-from config import config
-
-from loss import Hamiltonian, cal_l2_norm
-
-from utils.misc import torch_accuracy, AvgMeter
 from collections import OrderedDict
 import torch
 from tqdm import tqdm
+
+from experiments.CIFAR10.wide34_yopo_5_3.config import config
+# from experiments.CIFAR10.wide34_yopo_5_3.loss import Hamiltonian, cal_l2_norm
+from lib.utils.misc import torch_accuracy, AvgMeter
 
 
 class FastGradientLayerOneTrainer(object):
@@ -58,12 +57,11 @@ class FastGradientLayerOneTrainer(object):
         return yofo_inp, eta
 
 
-def train_one_epoch(net, batch_generator, optimizer, criterion, LayerOneTrainner, K,
+def train_one_epoch(net, batch_generator, optimizer, criterion, LayerOneTrainer, K,
                     device, descrip_str='Training'):
     """
-    :param attack_freq:  Frequencies of training with adversarial examples. -1 indicates natural training
-    :param AttackMethod: the attack method, None represents natural training
-    :return:  None    #(clean_acc, adv_acc)
+
+    :return: clean_acc, adv_acc
     """
     net.train()
     pbar = tqdm(batch_generator)
@@ -79,7 +77,7 @@ def train_one_epoch(net, batch_generator, optimizer, criterion, LayerOneTrainner
         eta.requires_grad_()
 
         optimizer.zero_grad()
-        LayerOneTrainner.param_optimizer.zero_grad()
+        LayerOneTrainer.param_optimizer.zero_grad()
 
         for j in range(K):
             # optimizer.zero_grad()
@@ -103,7 +101,7 @@ def train_one_epoch(net, batch_generator, optimizer, criterion, LayerOneTrainner
             # optimizer.zero_grad()
 
             p = -1.0 * net.layer_one_out.grad
-            yofo_inp, eta = LayerOneTrainner.step(data, p, eta)
+            yofo_inp, eta = LayerOneTrainer.step(data, p, eta)
 
             with torch.no_grad():
                 if j == 0:
@@ -117,9 +115,9 @@ def train_one_epoch(net, batch_generator, optimizer, criterion, LayerOneTrainner
             # pbar_dic['grad'] = '{}'.format(grad_mean)
 
         optimizer.step()
-        LayerOneTrainner.param_optimizer.step()
+        LayerOneTrainer.param_optimizer.step()
         optimizer.zero_grad()
-        LayerOneTrainner.param_optimizer.zero_grad()
+        LayerOneTrainer.param_optimizer.zero_grad()
         pbar_dic['Acc'] = '{:.2f}'.format(cleanacc)
         pbar_dic['loss'] = '{:.2f}'.format(cleanloss)
         pbar_dic['YofoAcc'] = '{:.2f}'.format(yofoacc)

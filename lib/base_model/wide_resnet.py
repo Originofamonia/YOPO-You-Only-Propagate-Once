@@ -1,22 +1,20 @@
-'''
+"""
 This code is from https://github.com/yaodongyu/TRADES/blob/master/models/wideresnet.py/
 @article{Zhang2019theoretically,
-	author = {Hongyang Zhang and Yaodong Yu and Jiantao Jiao and Eric P. Xing and Laurent El Ghaoui and Michael I. Jordan},
-	title = {Theoretically Principled Trade-off between Robustness and Accuracy},
-	journal = {arXiv preprint arXiv:1901.08573},
-	year = {2019}
+author = {Hongyang Zhang and Yaodong Yu and Jiantao Jiao and Eric P. Xing and Laurent El Ghaoui and Michael I. Jordan},
+title = {Theoretically Principled Trade-off between Robustness and Accuracy},
+journal = {arXiv preprint arXiv:1901.08573},
+year = {2019}
 }
-'''
+"""
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import math
 
 
 class BasicBlock(nn.Module):
 
     def __init__(self, in_planes, out_planes, stride, drop_rate=0.0):
-
         super(BasicBlock, self).__init__()
         self.bn1 = nn.BatchNorm2d(in_planes)
         self.relu1 = nn.ReLU(inplace=True)

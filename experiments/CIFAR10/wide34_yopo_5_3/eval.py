@@ -1,14 +1,14 @@
-from config import config
-from dataset import create_test_dataset
-from network import create_network
-
-from training.train import eval_one_epoch
-from utils.misc import load_checkpoint
-
 import argparse
 import torch
-import numpy as np
+# import numpy as np
 import os
+
+from experiments.CIFAR10.wide34_yopo_5_3.config import config
+from experiments.CIFAR10.wide34_yopo_5_3.dataset import create_test_dataset
+from experiments.CIFAR10.wide34_yopo_5_3.network import create_network
+
+from lib.training.train import eval_one_epoch
+from lib.utils.misc import load_checkpoint
 
 
 def main():
@@ -25,7 +25,7 @@ def main():
     net = create_network()
     net.to(device)
 
-    ds_val = create_test_dataset(512)
+    ds_val = create_test_dataset(100)
 
     attack_method = config.create_evaluation_attack_method(device)
 
