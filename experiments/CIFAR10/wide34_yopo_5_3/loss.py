@@ -22,9 +22,9 @@ class Hamiltonian(_Loss):
         return H
 
 
-class CrossEntropyWithWeightPenlty(_Loss):
+class CrossEntropyWithWeightPenalty(_Loss):
     def __init__(self, module, device, reg_cof=1e-4):
-        super(CrossEntropyWithWeightPenlty, self).__init__()
+        super(CrossEntropyWithWeightPenalty, self).__init__()
 
         self.reg_cof = reg_cof
         self.criterion = nn.CrossEntropyLoss().to(device)

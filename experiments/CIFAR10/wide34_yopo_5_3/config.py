@@ -5,26 +5,15 @@ import argparse
 import numpy as np
 import torch
 
-
-def add_path(path):
-    if path not in sys.path:
-        print('Adding {}'.format(path))
-        sys.path.append(path)
-
-
-abs_current_path = os.path.realpath('./')
-root_path = os.path.join('/', *abs_current_path.split(os.path.sep)[:-3])
-lib_dir = os.path.join(root_path, 'lib')
-# add_path(lib_dir)
-add_path(root_path)
-
-# from loss import CrossEntropyWithWeightPenlty
+# from loss import CrossEntropyWithWeightPenalty
 from lib.training.config import TrainingConfigBase, SGDOptimizerMaker, \
     PieceWiseConstantLrSchedulerMaker, IPGDAttackMethodMaker
 
 
 class TrainingConfig(TrainingConfigBase):
-    lib_dir = lib_dir
+    abs_current_path = os.path.realpath('./')
+    root_path = os.path.join('/', *abs_current_path.split(os.path.sep)[:-3])
+    lib_dir = os.path.join(root_path, 'lib')
 
     num_epochs = 36
     eval_interval = 10
