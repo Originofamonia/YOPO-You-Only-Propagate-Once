@@ -41,10 +41,10 @@ class TrainingConfigBase(metaclass=ABCMeta):
 
     @property
     def val_interval(self):
-        '''
+        """
         Specify how many epochs between two validation steps
         Return <= 0 means no validation phase
-        '''
+        """
         return 0
 
     @abstractmethod
@@ -71,7 +71,6 @@ class TrainingConfigBase(metaclass=ABCMeta):
         return None
 
     # Evaluation Setting
-
     def create_evaluation_attack_method(self, *inputs):
         """
         evaluating the robustness of model against xxx adversary
@@ -116,7 +115,7 @@ class IPGDAttackMethodMaker(object):
         # print(father_dir)
         if not father_dir in sys.path:
             sys.path.append(father_dir)
-        from attack.pgd import IPGD
+        from lib.attack.pgd import IPGD
         return IPGD(self.eps, self.sigma, self.nb_iters, self.norm, DEVICE, self.mean, self.std)
 
 
