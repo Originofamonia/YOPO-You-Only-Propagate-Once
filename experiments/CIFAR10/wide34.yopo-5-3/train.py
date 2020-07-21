@@ -62,17 +62,17 @@ def main():
         #     break
         # now_epoch = now_epoch + 1
 
-        descrip_str = 'Training epoch:{}/{} -- lr:{}'.format(now_epoch, config.num_epochs,
+        descrip_str = 'Training epoch:{}/{} -- lr:{}'.format(i, config.num_epochs,
                                                              lr_scheduler.get_last_lr()[0])
         acc, yofoacc = train_one_epoch(net, ds_train, optimizer, criterion, layer_1_trainer, config.K,
                                        device, descrip_str)
         tb_train_dic = {'Acc': acc, 'YofoAcc': yofoacc}
         print(tb_train_dic)
-        writer.add_scalars('Train', tb_train_dic, now_epoch)
-        if config.val_interval > 0 and now_epoch % config.val_interval == 0:
+        writer.add_scalars('Train', tb_train_dic, i)
+        if config.val_interval > 0 and i % config.val_interval == 0:
             acc, advacc = eval_one_epoch(net, ds_val, device, eval_attack)
             tb_val_dic = {'Acc': acc, 'AdvAcc': advacc}
-            writer.add_scalars('Val', tb_val_dic, now_epoch)
+            writer.add_scalars('Val', tb_val_dic, i)
 
         lr_scheduler.step()
         layer_1_optimizer_lr_scheduler.step()
