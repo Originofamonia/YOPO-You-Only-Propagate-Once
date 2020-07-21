@@ -35,3 +35,7 @@ def main():
     print('Evaluating')
     clean_acc, adv_acc = eval_one_epoch(net, ds_val, device, attack_method)
     print('clean acc -- {}     adv acc -- {}'.format(clean_acc, adv_acc))
+
+
+if __name__ == '__main__':
+    main()

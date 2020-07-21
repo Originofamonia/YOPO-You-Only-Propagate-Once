@@ -1,4 +1,4 @@
-from easydict import EasyDict
+# from easydict import EasyDict
 import sys
 import os
 import argparse
@@ -25,7 +25,7 @@ class TrainingConfig(TrainingConfigBase):
     lib_dir = lib_dir
 
     num_epochs = 105
-    val_interval = 10
+    eval_interval = 10
 
     create_optimizer = SGDOptimizerMaker(lr=1e-1, momentum=0.9, weight_decay=2e-4)
     create_lr_scheduler = PieceWiseConstantLrSchedulerMaker(milestones=[75, 90, 100], gamma=0.1)

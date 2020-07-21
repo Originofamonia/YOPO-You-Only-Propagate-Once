@@ -49,7 +49,7 @@ def main():
                                                              lr_scheduler.get_last_lr()[0])
         train_one_epoch(net, ds_train, optimizer, criterion, device,
                         descrip_str, train_attack, adv_coef=args.adv_coef)
-        if config.val_interval > 0 and i % config.val_interval == 0:
+        if config.eval_interval > 0 and i % config.eval_interval == 0:
             eval_one_epoch(net, ds_val, device, eval_attack)
 
         lr_scheduler.step()

@@ -1,4 +1,4 @@
-from easydict import EasyDict
+# from easydict import EasyDict
 import sys
 import os
 import argparse
@@ -26,7 +26,7 @@ class TrainingConfig(TrainingConfigBase):
     lib_dir = lib_dir
 
     num_epochs = 36
-    val_interval = 2
+    eval_interval = 10
     weight_decay = 5e-4
 
     inner_iters = 3
