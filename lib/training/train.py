@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 father_dir = os.path.join('/', *os.path.realpath(__file__).split(os.path.sep)[:-2])
 # print(father_dir)
-if not father_dir in sys.path:
+if father_dir not in sys.path:
     sys.path.append(father_dir)
 
 

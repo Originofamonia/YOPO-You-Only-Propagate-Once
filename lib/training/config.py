@@ -110,13 +110,13 @@ class IPGDAttackMethodMaker(object):
         self.mean = mean
         self.std = std
 
-    def __call__(self, DEVICE):
+    def __call__(self, device):
         father_dir = os.path.join('/', *os.path.realpath(__file__).split(os.path.sep)[:-2])
         # print(father_dir)
-        if not father_dir in sys.path:
+        if father_dir not in sys.path:
             sys.path.append(father_dir)
         from lib.attack.pgd import IPGD
-        return IPGD(self.eps, self.sigma, self.nb_iters, self.norm, DEVICE, self.mean, self.std)
+        return IPGD(self.eps, self.sigma, self.nb_iters, self.norm, device, self.mean, self.std)
 
 
 class LambdaLrSchedulerMaker(object):

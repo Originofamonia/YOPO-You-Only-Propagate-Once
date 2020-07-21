@@ -1,14 +1,15 @@
 """
 this code is from https://github.com/yaodongyu/TRADES/blob/master/models/small_cnn.py
 @article{Zhang2019theoretically,
-	author = {Hongyang Zhang and Yaodong Yu and Jiantao Jiao and Eric P. Xing and Laurent El Ghaoui and Michael I. Jordan},
-	title = {Theoretically Principled Trade-off between Robustness and Accuracy},
-	journal = {arXiv preprint arXiv:1901.08573},
-	year = {2019}
+author = {Hongyang Zhang and Yaodong Yu and Jiantao Jiao and Eric P. Xing and Laurent El Ghaoui and Michael I. Jordan},
+title = {Theoretically Principled Trade-off between Robustness and Accuracy},
+journal = {arXiv preprint arXiv:1901.08573},
+year = {2019}
 }
 """
 from collections import OrderedDict
 import torch.nn as nn
+import torch
 
 
 class SmallCNN(nn.Module):
