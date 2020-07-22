@@ -13,7 +13,7 @@ if father_dir not in sys.path:
 
 
 def train_one_epoch(net, batch_generator, optimizer, criterion, device,
-                    descrip_str='Training', attack_method=None, adv_coef=1.0):
+                    descr_str='Training', attack_method=None, adv_coef=1.0):
     """
     :param attack_freq:  Frequencies of training with adversarial examples. -1 indicates natural training
     :param attack_method: the attack method, None represents natural training
@@ -25,7 +25,7 @@ def train_one_epoch(net, batch_generator, optimizer, criterion, device,
     advloss = -1
     cleanacc = -1
     cleanloss = -1
-    pbar.set_description(descrip_str)
+    pbar.set_description(descr_str)
     for i, (data, label) in enumerate(pbar):
         data, label = data.to(device), label.to(device)
 

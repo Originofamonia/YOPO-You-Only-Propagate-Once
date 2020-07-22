@@ -56,7 +56,7 @@ class FastGradientLayerOneTrainer(object):
 
 
 def train_one_epoch(net, batch_generator, optimizer, criterion, LayerOneTrainer, K,
-                    device, descrip_str='Training'):
+                    device, descr_str='Training'):
     """
 
     :return: clean_acc, adv_acc
@@ -66,11 +66,11 @@ def train_one_epoch(net, batch_generator, optimizer, criterion, LayerOneTrainer,
     yofoacc = -1
     cleanacc = -1
     cleanloss = -1
-    pbar.set_description(descrip_str)
+    pbar.set_description(descr_str)
     for i, (data, label) in enumerate(pbar):
         data, label = data.to(device), label.to(device)
 
-        eta = torch.FloatTensor(*data.shape).uniform_(-config.eps, config.eps)
+        eta = torch.cuda.FloatTensor(*data.shape).uniform_(-config.eps, config.eps)
         eta = eta.to(device)
         eta.requires_grad_()
 
