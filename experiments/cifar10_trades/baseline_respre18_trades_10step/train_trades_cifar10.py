@@ -110,7 +110,7 @@ def main():
         # adversarial training
         train(args, model, device, train_loader, optimizer, i, descr_str)
         now_train_time += time() - s_time
-        if config.log_interval > 0 and i % config.log_interval == 0:
+        if args.log_interval > 0 and i % args.log_interval == 0:
             acc, advacc = eval_one_epoch(model, test_loader, device, eval_attack)
             tb_val_dic = {'Acc': acc, 'AdvAcc': advacc}
             print('Eval: {}'.format(tb_val_dic))
