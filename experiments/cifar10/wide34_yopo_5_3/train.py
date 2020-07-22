@@ -23,14 +23,14 @@ lib_dir = os.path.join(root_path, 'lib')
 # add_path(lib_dir)
 add_path(root_path)
 
-from experiments.cifar109.wide34_yopo_5_3.config import config, args
-from experiments.cifar109.wide34_yopo_5_3.dataset import create_train_dataset, create_test_dataset
-from experiments.cifar109.wide34_yopo_5_3.network import create_network
+from experiments.cifar10.wide34_yopo_5_3.config import config, args
+from experiments.cifar10.wide34_yopo_5_3.dataset import create_train_dataset, create_test_dataset
+from experiments.cifar10.wide34_yopo_5_3.network import create_network
 
 from lib.utils.misc import save_args, save_checkpoint, load_checkpoint
 from lib.training.train import eval_one_epoch
-from experiments.cifar109.wide34_yopo_5_3.loss import Hamiltonian, CrossEntropyWithWeightPenalty
-from experiments.cifar109.wide34_yopo_5_3.training_function import train_one_epoch, FastGradientLayerOneTrainer
+from experiments.cifar10.wide34_yopo_5_3.loss import Hamiltonian, CrossEntropyWithWeightPenalty
+from experiments.cifar10.wide34_yopo_5_3.training_function import train_one_epoch, FastGradientLayerOneTrainer
 
 
 def main():
