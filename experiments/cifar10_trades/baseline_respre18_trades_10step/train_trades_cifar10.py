@@ -86,10 +86,10 @@ def main():
     model_dir = args.model_dir
     if not os.path.exists(model_dir):
         os.makedirs(model_dir)
-    use_cuda = not args.no_cuda and torch.cuda.is_available()
+    # use_cuda = not args.no_cuda and torch.cuda.is_available()
     torch.manual_seed(args.seed)
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
+    # kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
 
     model = create_network().to(device)
 

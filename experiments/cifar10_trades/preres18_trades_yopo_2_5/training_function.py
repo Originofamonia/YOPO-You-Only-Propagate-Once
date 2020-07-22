@@ -1,14 +1,13 @@
 import torch
 import torch.nn as nn
-from experiments.cifar10_trades.preres18_TRADES_YOPO_3_4.config import config
-
-from experiments.cifar10_trades.preres18_TRADES_YOPO_3_4.loss import Hamiltonian, cal_l2_norm
-import torch.nn.functional as F
-
-from lib.utils.misc import torch_accuracy, AvgMeter
 from collections import OrderedDict
 import torch
+import torch.nn.functional as F
 from tqdm import tqdm
+
+from experiments.cifar10_trades.preres18_trades_yopo_2_5.config import config
+from experiments.cifar10_trades.preres18_trades_yopo_2_5.loss import Hamiltonian, cal_l2_norm
+from lib.utils.misc import torch_accuracy, AvgMeter
 
 
 class FastGradientLayerOneTrainer(object):
@@ -22,6 +21,11 @@ class FastGradientLayerOneTrainer(object):
         self.param_optimizer = param_optimizer
 
     def step(self, inp, p, eta):
+        """
+        Perform Iterative Sign Gradient on eta
+        ret: inp + eta
+        """
+
         p = p.detach()
 
         for i in range(self.inner_steps):
@@ -41,7 +45,6 @@ class FastGradientLayerOneTrainer(object):
 
         yofo_inp = eta + inp
         yofo_inp = torch.clamp(yofo_inp, 0, 1)
-
         loss = -1.0 * (self.Hamiltonian_func(yofo_inp, p) -
                        config.weight_decay * cal_l2_norm(self.Hamiltonian_func.layer))
 
@@ -58,19 +61,21 @@ def train_one_epoch(net, batch_generator, optimizer,
     yofoacc = -1
     pbar.set_description(descr_str)
 
-    trades_criterion = torch.nn.KLDivLoss(reduction='batchmean')  # .to(DEVICE)
+    trades_criterion = torch.nn.KLDivLoss(reduction='sum')  # .to(DEVICE)
 
     for i, (data, label) in enumerate(pbar):
         data = data.to(device)
         label = label.to(device)
 
         net.eval()
-        eta = 1e-3 * torch.randn(data.shape).cuda().detach().to(device)
+        eta = 0.001 * torch.randn(data.shape).cuda().detach().to(device)
+
         eta.requires_grad_()
 
         raw_soft_label = F.softmax(net(data), dim=1).detach()
         for j in range(K):
             pred = net(data + eta.detach())
+
             with torch.enable_grad():
                 loss = trades_criterion(F.log_softmax(pred, dim=1), raw_soft_label)  # raw_soft_label.detach())
 

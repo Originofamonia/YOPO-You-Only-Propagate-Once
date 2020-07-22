@@ -6,24 +6,23 @@ import torch.nn.functional as F
 
 class Hamiltonian(_Loss):
 
-    def __init__(self, layer, reg_cof = 1e-4):
+    def __init__(self, layer, reg_cof=1e-4):
         super(Hamiltonian, self).__init__()
         self.layer = layer
         self.reg_cof = 0
 
     def forward(self, x, p):
-
         y = self.layer(x)
         H = torch.sum(y * p)
         return H
 
 
-class CrossEntropyWithWeightPenlty(_Loss):
-    def __init__(self, module, DEVICE, reg_cof = 1e-4):
-        super(CrossEntropyWithWeightPenlty, self).__init__()
+class CrossEntropyWithWeightPenalty(_Loss):
+    def __init__(self, module, device, reg_cof=1e-4):
+        super(CrossEntropyWithWeightPenalty, self).__init__()
 
         self.reg_cof = reg_cof
-        self.criterion = nn.CrossEntropyLoss().to(DEVICE)
+        self.criterion = nn.CrossEntropyLoss().to(device)
         self.module = module
 
     def __call__(self, pred, label):
@@ -35,10 +34,9 @@ class CrossEntropyWithWeightPenlty(_Loss):
 
 
 def cal_l2_norm(layer: torch.nn.Module):
- loss = 0.
- for name, param in layer.named_parameters():
-     if name == 'weight':
-         loss = loss + 0.5 * torch.norm(param,) ** 2
+    loss = 0.
+    for name, param in layer.named_parameters():
+        if name == 'weight':
+            loss = loss + 0.5 * torch.norm(param, ) ** 2
 
- return loss
-
+    return loss

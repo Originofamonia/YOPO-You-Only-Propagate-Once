@@ -14,14 +14,14 @@ abs_current_path = os.path.realpath('./')
 root_path = os.path.join('/', *abs_current_path.split(os.path.sep)[:-3])
 add_path(root_path)
 
-from experiments.cifar10_trades.preres18_TRADES_YOPO_3_4.config import config, args
+from experiments.cifar10_trades.preres18_trades_yopo_3_4.config import config, args
 from experiments.dataset import create_train_dataset, create_test_dataset
-from experiments.cifar10_trades.preres18_TRADES_YOPO_3_4.network import create_network
+from experiments.cifar10_trades.preres18_trades_yopo_3_4.network import create_network
 
 from lib.utils.misc import save_args, save_checkpoint, load_checkpoint
 from lib.training.train import eval_one_epoch
-from experiments.cifar10_trades.preres18_TRADES_YOPO_3_4.loss import Hamiltonian, CrossEntropyWithWeightPenalty
-from experiments.cifar10_trades.preres18_TRADES_YOPO_3_4.training_function import train_one_epoch, \
+from experiments.cifar10_trades.preres18_trades_yopo_3_4.loss import Hamiltonian, CrossEntropyWithWeightPenalty
+from experiments.cifar10_trades.preres18_trades_yopo_3_4.training_function import train_one_epoch, \
     FastGradientLayerOneTrainer
 
 

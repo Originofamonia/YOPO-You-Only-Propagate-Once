@@ -4,7 +4,7 @@ import os
 import argparse
 import numpy as np
 import torch
-# from experiments.cifar10_trades.preres18_TRADES_YOPO_3_4.loss import CrossEntropyWithWeightPenalty
+# from experiments.cifar10_trades.preres18_trades_yopo_3_4.loss import CrossEntropyWithWeightPenalty
 
 from lib.training.config import TrainingConfigBase, SGDOptimizerMaker, \
     PieceWiseConstantLrSchedulerMaker, IPGDAttackMethodMaker
@@ -43,7 +43,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument('--resume', default=None, type=str, metavar='PATH',
                     help='path to latest checkpoint (default: none)')
-parser.add_argument('-b', '--batch_size', default=10, type=int,
+parser.add_argument('-b', '--batch_size', default=200, type=int,
                     metavar='N', help='mini-batch size')
 parser.add_argument('-d', type=int, default=0, help='Which gpu to use')
 parser.add_argument('-adv_coef', default=1.0, type=float,
