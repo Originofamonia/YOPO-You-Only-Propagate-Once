@@ -9,10 +9,10 @@ import numpy as np
 import os
 import sys
 
-from attack.attack_base import AttackBase, clip_eta
+from lib.attack.attack_base import AttackBase, clip_eta
 
 father_dir = os.path.join('/', *os.path.realpath(__file__).split(os.path.sep)[:-2])
-if not father_dir in sys.path:
+if father_dir not in sys.path:
     sys.path.append(father_dir)
 
 
@@ -39,7 +39,7 @@ class IPGD(AttackBase):
         self.nb_iter = nb_iter
         self.norm = norm
         self.criterion = torch.nn.CrossEntropyLoss().to(device)
-        self.DEVICE = device
+        self.device = device
         self._mean = mean.to(device)
         self._std = std.to(device)
         self.random_start = random_start
@@ -77,7 +77,7 @@ class IPGD(AttackBase):
         tmp_adv_inp = torch.clamp(tmp_adv_inp, 0, 1)  # clip into 0-1
         # tmp_adv_inp = (tmp_adv_inp - self._mean) / self._std
         tmp_eta = tmp_adv_inp - tmp_inp
-        tmp_eta = clip_eta(tmp_eta, norm=self.norm, eps=self.eps, DEVICE=self.DEVICE)
+        tmp_eta = clip_eta(tmp_eta, norm=self.norm, eps=self.eps, device=self.device)
 
         eta = tmp_eta / self._std
 
@@ -89,7 +89,7 @@ class IPGD(AttackBase):
             eta = torch.FloatTensor(*inp.shape).uniform_(-self.eps, self.eps)
         else:
             eta = torch.zeros_like(inp)
-        eta = eta.to(self.DEVICE)
+        eta = eta.to(self.device)
         eta = (eta - self._mean) / self._std
         net.eval()
 
@@ -108,7 +108,7 @@ class IPGD(AttackBase):
         return adv_inp
 
     def to(self, device):
-        self.DEVICE = device
+        self.device = device
         self._mean = self._mean.to(device)
         self._std = self._std.to(device)
         self.criterion = self.criterion.to(device)
