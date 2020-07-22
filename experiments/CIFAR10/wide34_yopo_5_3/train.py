@@ -6,6 +6,8 @@ import sys
 # import torch.nn as nn
 import torch.optim as optim
 import os
+
+
 # from collections import OrderedDict
 
 
@@ -21,14 +23,14 @@ lib_dir = os.path.join(root_path, 'lib')
 # add_path(lib_dir)
 add_path(root_path)
 
-from experiments.CIFAR10.wide34_yopo_5_3.config import config, args
-from experiments.CIFAR10.wide34_yopo_5_3.dataset import create_train_dataset, create_test_dataset
-from experiments.CIFAR10.wide34_yopo_5_3.network import create_network
+from experiments.cifar10.wide34_yopo_5_3.config import config, args
+from experiments.cifar10.wide34_yopo_5_3.dataset import create_train_dataset, create_test_dataset
+from experiments.cifar10.wide34_yopo_5_3.network import create_network
 
 from lib.utils.misc import save_args, save_checkpoint, load_checkpoint
 from lib.training.train import eval_one_epoch
-from experiments.CIFAR10.wide34_yopo_5_3.loss import Hamiltonian, CrossEntropyWithWeightPenalty
-from experiments.CIFAR10.wide34_yopo_5_3.training_function import train_one_epoch, FastGradientLayerOneTrainer
+from experiments.cifar10.wide34_yopo_5_3.loss import Hamiltonian, CrossEntropyWithWeightPenalty
+from experiments.cifar10.wide34_yopo_5_3.training_function import train_one_epoch, FastGradientLayerOneTrainer
 
 
 def main():
@@ -56,7 +58,7 @@ def main():
                                                   config.inner_iters, config.sigma, config.eps)
 
     ds_train = create_train_dataset(args.batch_size)
-    ds_val = create_test_dataset(args.batch_size)
+    ds_eval = create_test_dataset(args.batch_size)
 
     # TrainAttack = config.create_attack_method(device)
     eval_attack = config.create_evaluation_attack_method(device)
@@ -70,23 +72,26 @@ def main():
 
     for i in range(now_epoch, config.num_epochs):
 
-        descrip_str = 'Training epoch:{}/{} -- lr:{}'.format(i, config.num_epochs,
-                                                             lr_scheduler.get_last_lr()[0])
+        descr_str = 'Epoch:{}/{} -- lr:{}'.format(i, config.num_epochs,
+                                                  lr_scheduler.get_last_lr()[0])
         acc, yofoacc = train_one_epoch(net, ds_train, optimizer, criterion, layer_1_trainer, config.K,
-                                       device, descrip_str)
+                                       device, descr_str)
         tb_train_dic = {'Acc': acc, 'YofoAcc': yofoacc}
-        print(tb_train_dic)
+        print('Train: {}'.format(tb_train_dic))
 
         if config.eval_interval > 0 and i % config.eval_interval == 0:
-            acc, advacc = eval_one_epoch(net, ds_val, device, eval_attack)
+            acc, advacc = eval_one_epoch(net, ds_eval, device, eval_attack)
             tb_val_dic = {'Acc': acc, 'AdvAcc': advacc}
-            print(tb_val_dic)
+            print('Eval: {}'.format(tb_val_dic))
 
         lr_scheduler.step()
         layer_1_optimizer_lr_scheduler.step()
 
     save_checkpoint(now_epoch, net, optimizer, lr_scheduler,
                     file_name=os.path.join(config.model_dir, 'epoch-{}.checkpoint'.format(now_epoch)))
+
+    clean_acc, adv_acc = eval_one_epoch(net, ds_eval, device, eval_attack)
+    print('Eval: clean acc: {}; adv acc: {}'.format(clean_acc, adv_acc))
 
 
 if __name__ == '__main__':

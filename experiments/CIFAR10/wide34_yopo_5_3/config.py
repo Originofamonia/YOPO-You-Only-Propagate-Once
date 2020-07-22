@@ -26,7 +26,7 @@ class TrainingConfig(TrainingConfigBase):
     eps = 8 / 255.0
 
     create_optimizer = SGDOptimizerMaker(lr=1e-1 * 4 / K, momentum=0.9, weight_decay=5e-4)
-    create_lr_scheduler = PieceWiseConstantLrSchedulerMaker(milestones=[30, 34, 36], gamma=0.1)
+    create_lr_scheduler = PieceWiseConstantLrSchedulerMaker(milestones=[30, 34, 36], gamma=1e-1)
 
     create_loss_function = nn.CrossEntropyLoss
 
@@ -45,7 +45,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument('--resume', default=None, type=str, metavar='PATH',
                     help='path to latest checkpoint (default: none)')
-parser.add_argument('-b', '--batch_size', default=100, type=int,
+parser.add_argument('-b', '--batch_size', default=10, type=int,
                     metavar='N', help='mini-batch size')
 parser.add_argument('-d', type=int, default=0, help='Which gpu to use')
 parser.add_argument('-adv_coef', default=1.0, type=float,

@@ -1,10 +1,9 @@
 import torch
 import torch.nn as nn
 from collections import OrderedDict
-import torch
 from tqdm import tqdm
 
-from experiments.CIFAR10.wide34_yopo_5_3.config import config
+from experiments.cifar10.wide34_yopo_5_3.config import config
 # from experiments.CIFAR10.wide34_yopo_5_3.loss import Hamiltonian, cal_l2_norm
 from lib.utils.misc import torch_accuracy, AvgMeter
 
@@ -22,8 +21,7 @@ class FastGradientLayerOneTrainer(object):
     def step(self, inp, p, eta):
         """
         Perform Iterative Sign Gradient on eta
-
-        ret: inp + eta
+        ret: inp, eta
         """
 
         p = p.detach()
