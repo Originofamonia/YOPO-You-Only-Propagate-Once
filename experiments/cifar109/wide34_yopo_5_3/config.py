@@ -17,7 +17,7 @@ class TrainingConfig(TrainingConfigBase):
     lib_dir = os.path.join(root_path, 'lib')
 
     num_epochs = 36
-    eval_interval = 10
+    eval_interval = 6
     weight_decay = 5e-4
 
     inner_iters = 3

@@ -3,7 +3,7 @@ import torch.nn as nn
 from collections import OrderedDict
 from tqdm import tqdm
 
-from experiments.cifar10.wide34_yopo_5_3.config import config
+from experiments.cifar109.wide34_yopo_5_3.config import config
 # from experiments.CIFAR10.wide34_yopo_5_3.loss import Hamiltonian, cal_l2_norm
 from lib.utils.misc import torch_accuracy, AvgMeter
 
