@@ -76,7 +76,7 @@ def main():
         tb_train_dic = {'Acc': acc, 'YofoAcc': yofoacc}
         print(tb_train_dic)
         writer.add_scalars('Train', tb_train_dic, now_epoch)
-        if config.val_interval > 0 and now_epoch % config.val_interval == 0:
+        if config.eval_interval > 0 and now_epoch % config.eval_interval == 0:
             acc, advacc = eval_one_epoch(net, ds_val, device, EvalAttack)
             tb_val_dic = {'Acc': acc, 'AdvAcc': advacc}
             writer.add_scalars('Val', tb_val_dic, now_epoch)

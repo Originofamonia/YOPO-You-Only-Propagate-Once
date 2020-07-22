@@ -3,8 +3,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 
-from config import config
-from utils.misc import torch_accuracy, AvgMeter
+# from experiments.cifar10_trades.baseline_respre18_trades_10step.config import config
+from lib.utils.misc import torch_accuracy, AvgMeter
+
 
 def squared_l2_norm(x):
     flattened = x.view(x.shape[0], -1)

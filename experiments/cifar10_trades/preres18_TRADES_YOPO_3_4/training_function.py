@@ -58,7 +58,7 @@ def train_one_epoch(net, batch_generator, optimizer,
     yofoacc = -1
     pbar.set_description(descr_str)
 
-    trades_criterion = torch.nn.KLDivLoss(reduction='mean')  # .to(DEVICE)
+    trades_criterion = torch.nn.KLDivLoss(reduction='batchmean')  # .to(DEVICE)
 
     for i, (data, label) in enumerate(pbar):
         data = data.to(device)

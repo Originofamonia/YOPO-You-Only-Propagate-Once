@@ -10,13 +10,13 @@ from lib.training.config import TrainingConfigBase, SGDOptimizerMaker, \
     PieceWiseConstantLrSchedulerMaker, IPGDAttackMethodMaker
 
 
-class TrainingConfing(TrainingConfigBase):
+class TrainingConfig(TrainingConfigBase):
     abs_current_path = os.path.realpath('./')
     root_path = os.path.join('/', *abs_current_path.split(os.path.sep)[:-3])
     lib_dir = os.path.join(root_path, 'lib')
 
     num_epochs = 105
-    val_interval = 10
+    eval_interval = 15
     weight_decay = 5e-4
 
     inner_iters = 4
@@ -37,7 +37,7 @@ class TrainingConfing(TrainingConfigBase):
                               std=torch.tensor(np.array([1]).astype(np.float32)[np.newaxis, :, np.newaxis, np.newaxis]))
 
 
-config = TrainingConfing()
+config = TrainingConfig()
 
 parser = argparse.ArgumentParser()
 

@@ -7,41 +7,30 @@ import json
 
 import argparse
 import torch
-import torch.nn as nn
+import sys
 import torch.nn.functional as F
 import torchvision
 import torch.optim as optim
 from torchvision import datasets, transforms
 
-from config import config, args
-from network import create_network
-from trades import trades_loss
 
-from training.train import eval_one_epoch
-from utils.misc import torch_accuracy, AvgMeter
+def add_path(path):
+    if path not in sys.path:
+        print('Adding {}'.format(path))
+        sys.path.append(path)
 
-# settings
-model_dir = args.model_dir
-if not os.path.exists(model_dir):
-    os.makedirs(model_dir)
-use_cuda = not args.no_cuda and torch.cuda.is_available()
-torch.manual_seed(args.seed)
-device = torch.device('cuda:{}'.format(args.d) if use_cuda else "cpu")
-kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
 
-# setup data loader
-transform_train = transforms.Compose([
-    transforms.RandomCrop(32, padding=4),
-    transforms.RandomHorizontalFlip(),
-    transforms.ToTensor(),
-])
-transform_test = transforms.Compose([
-    transforms.ToTensor(),
-])
-trainset = torchvision.datasets.CIFAR10(root='../data', train=True, download=True, transform=transform_train)
-train_loader = torch.utils.data.DataLoader(trainset, batch_size=args.batch_size, shuffle=True, **kwargs)
-testset = torchvision.datasets.CIFAR10(root='../data', train=False, download=True, transform=transform_test)
-test_loader = torch.utils.data.DataLoader(testset, batch_size=args.test_batch_size, shuffle=False, **kwargs)
+abs_current_path = os.path.realpath('./')
+root_path = os.path.join('/', *abs_current_path.split(os.path.sep)[:-3])
+lib_dir = os.path.join(root_path, 'lib')
+add_path(root_path)
+
+from experiments.cifar10_trades.baseline_respre18_trades_10step.config import config, args
+from experiments.cifar10_trades.baseline_respre18_trades_10step.network import create_network
+from experiments.cifar10_trades.baseline_respre18_trades_10step.trades import trades_loss
+from experiments.dataset import create_train_dataset, create_test_dataset
+from lib.training.train import eval_one_epoch
+from lib.utils.misc import torch_accuracy, AvgMeter
 
 
 def train(args, model, device, train_loader, optimizer, epoch, descrip_str='Training'):
@@ -65,7 +54,7 @@ def train(args, model, device, train_loader, optimizer, epoch, descrip_str='Trai
                                                                    step_size=args.step_size,
                                                                    epsilon=args.epsilon,
                                                                    perturb_steps=args.num_steps,
-                                                                   beta=args.beta,)
+                                                                   beta=args.beta, )
         loss.backward()
         optimizer.step()
 
@@ -94,29 +83,44 @@ def adjust_learning_rate(optimizer, epoch):
 
 
 def main():
+    model_dir = args.model_dir
+    if not os.path.exists(model_dir):
+        os.makedirs(model_dir)
+    use_cuda = not args.no_cuda and torch.cuda.is_available()
+    torch.manual_seed(args.seed)
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
+
     model = create_network().to(device)
 
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum, weight_decay=args.weight_decay)
 
-    EvalAttack = config.create_evaluation_attack_method(device)
+    eval_attack = config.create_evaluation_attack_method(device)
+
+    train_loader = create_train_dataset(args.batch_size)
+    test_loader = create_test_dataset(args.batch_size)
 
     now_train_time = 0
-    for epoch in range(1, args.epochs + 1):
+    for i in range(1, args.epochs + 1):
         # adjust learning rate for SGD
-        adjust_learning_rate(optimizer, epoch)
+        adjust_learning_rate(optimizer, i)
 
         s_time = time()
-        descrip_str = 'Training epoch: {}/{}'.format(epoch, args.epochs)
+        descr_str = 'Epoch: {}/{}'.format(i, args.epochs)
         # adversarial training
-        train(args, model, device, train_loader, optimizer, epoch, descrip_str)
+        train(args, model, device, train_loader, optimizer, i, descr_str)
         now_train_time += time() - s_time
+        if config.log_interval > 0 and i % config.log_interval == 0:
+            acc, advacc = eval_one_epoch(model, test_loader, device, eval_attack)
+            tb_val_dic = {'Acc': acc, 'AdvAcc': advacc}
+            print('Eval: {}'.format(tb_val_dic))
 
-        acc, advacc = eval_one_epoch(model, test_loader, device, EvalAttack)
+    torch.save(model.state_dict(),
+               os.path.join(config.model_dir, 'model-wideres-epoch{}.pt'.format(i)))
 
-        # save checkpoint
-        if epoch % args.save_freq == 0:
-            torch.save(model.state_dict(),
-                       os.path.join(config.model_dir, 'model-wideres-epoch{}.pt'.format(epoch)))
+    acc, advacc = eval_one_epoch(model, test_loader, device, eval_attack)
+    tb_val_dic = {'Acc': acc, 'AdvAcc': advacc}
+    print('Eval: {}'.format(tb_val_dic))
 
 
 if __name__ == '__main__':

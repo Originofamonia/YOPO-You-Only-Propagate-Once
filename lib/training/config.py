@@ -40,7 +40,7 @@ class TrainingConfigBase(metaclass=ABCMeta):
         pass
 
     @property
-    def val_interval(self):
+    def eval_interval(self):
         """
         Specify how many epochs between two validation steps
         Return <= 0 means no validation phase
