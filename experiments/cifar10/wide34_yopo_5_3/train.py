@@ -8,9 +8,6 @@ import torch.optim as optim
 import os
 
 
-# from collections import OrderedDict
-
-
 def add_path(path):
     if path not in sys.path:
         print('Adding {}'.format(path))
@@ -20,16 +17,15 @@ def add_path(path):
 abs_current_path = os.path.realpath('./')
 root_path = os.path.join('/', *abs_current_path.split(os.path.sep)[:-3])
 lib_dir = os.path.join(root_path, 'lib')
-# add_path(lib_dir)
 add_path(root_path)
 
 from experiments.cifar10.wide34_yopo_5_3.config import config, args
-from experiments.cifar10.wide34_yopo_5_3.dataset import create_train_dataset, create_test_dataset
+from experiments.dataset import create_train_dataset, create_test_dataset
 from experiments.cifar10.wide34_yopo_5_3.network import create_network
 
-from lib.utils.misc import save_args, save_checkpoint, load_checkpoint
+from lib.utils.misc import save_checkpoint, load_checkpoint
 from lib.training.train import eval_one_epoch
-from experiments.cifar10.wide34_yopo_5_3.loss import Hamiltonian, CrossEntropyWithWeightPenalty
+from experiments.cifar10.wide34_yopo_5_3.loss import Hamiltonian
 from experiments.cifar10.wide34_yopo_5_3.training_function import train_one_epoch, FastGradientLayerOneTrainer
 
 

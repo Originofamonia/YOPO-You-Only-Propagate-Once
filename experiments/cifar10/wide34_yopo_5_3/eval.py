@@ -13,11 +13,10 @@ def add_path(path):
 abs_current_path = os.path.realpath('./')
 root_path = os.path.join('/', *abs_current_path.split(os.path.sep)[:-3])
 lib_dir = os.path.join(root_path, 'lib')
-# add_path(lib_dir)
 add_path(root_path)
 
 from experiments.cifar10.wide34_yopo_5_3.config import config
-from experiments.cifar10.wide34_yopo_5_3.dataset import create_test_dataset
+from experiments.dataset import create_test_dataset
 from experiments.cifar10.wide34_yopo_5_3.network import create_network
 
 from lib.training.train import eval_one_epoch

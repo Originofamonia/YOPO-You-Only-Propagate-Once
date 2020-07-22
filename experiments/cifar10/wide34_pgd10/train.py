@@ -1,12 +1,5 @@
-from config import config, args
-from dataset import create_train_dataset, create_test_dataset
-from network import create_network
-
-from utils.misc import save_args, save_checkpoint, load_checkpoint
-from training.train import train_one_epoch, eval_one_epoch
-
 import torch
-import json
+import sys
 import time
 import numpy as np
 from tensorboardX import SummaryWriter
@@ -14,6 +7,25 @@ import argparse
 
 import os
 from collections import OrderedDict
+
+
+def add_path(path):
+    if path not in sys.path:
+        print('Adding {}'.format(path))
+        sys.path.append(path)
+
+
+abs_current_path = os.path.realpath('./')
+root_path = os.path.join('/', *abs_current_path.split(os.path.sep)[:-3])
+lib_dir = os.path.join(root_path, 'lib')
+add_path(root_path)
+
+from experiments.cifar10.wide34_pgd10.config import config, args
+from experiments.dataset import create_train_dataset, create_test_dataset
+from experiments.cifar10.wide34_pgd10.network import create_network
+
+from lib.utils.misc import save_args, save_checkpoint, load_checkpoint
+from lib.training.train import train_one_epoch, eval_one_epoch
 
 
 def main():
@@ -41,21 +53,26 @@ def main():
         now_epoch = load_checkpoint(args.resume, net, optimizer, lr_scheduler)
 
     for i in range(now_epoch, config.num_epochs):
-        # if now_epoch > config.num_epochs:
-        #     break
-        # now_epoch = now_epoch + 1
 
-        descrip_str = 'Training epoch:{}/{} -- lr:{}'.format(i, config.num_epochs,
-                                                             lr_scheduler.get_last_lr()[0])
-        train_one_epoch(net, ds_train, optimizer, criterion, device,
-                        descrip_str, train_attack, adv_coef=args.adv_coef)
+        descr_str = 'Training epoch:{}/{} -- lr:{}'.format(i, config.num_epochs,
+                                                           lr_scheduler.get_last_lr()[0])
+        cleanacc, advacc = train_one_epoch(net, ds_train, optimizer, criterion, device,
+                                           descr_str, train_attack, adv_coef=args.adv_coef)
+        tb_train_dic = {'Acc': cleanacc, 'YofoAcc': advacc}
+        print('Train: {}'.format(tb_train_dic))
+
         if config.eval_interval > 0 and i % config.eval_interval == 0:
-            eval_one_epoch(net, ds_val, device, eval_attack)
+            acc, advacc = eval_one_epoch(net, ds_val, device, eval_attack)
+            tb_val_dic = {'Acc': acc, 'AdvAcc': advacc}
+            print('Eval: {}'.format(tb_val_dic))
 
         lr_scheduler.step()
 
     save_checkpoint(i, net, optimizer, lr_scheduler,
                     file_name=os.path.join(config.model_dir, 'epoch-{}.checkpoint'.format(i)))
+    acc, advacc = eval_one_epoch(net, ds_val, device, eval_attack)
+    tb_val_dic = {'Acc': acc, 'AdvAcc': advacc}
+    print('Eval: {}'.format(tb_val_dic))
 
 
 if __name__ == '__main__':

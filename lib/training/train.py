@@ -67,6 +67,8 @@ def train_one_epoch(net, batch_generator, optimizer, criterion, device,
         pbar_dic['Advloss'] = '{:.2f}'.format(advloss)
         pbar.set_postfix(pbar_dic)
 
+    return cleanacc, advacc
+
 
 def eval_one_epoch(net, batch_generator, device, attack_method=None):
     net.eval()

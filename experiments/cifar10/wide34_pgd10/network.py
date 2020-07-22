@@ -1,6 +1,6 @@
 import torch
-import config
-from base_model.wide_resnet import WideResNet
+# import experiments.cifar10.wide34_pgd10.config
+from lib.base_model.wide_resnet import WideResNet
 
 
 def create_network():
