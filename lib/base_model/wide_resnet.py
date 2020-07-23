@@ -106,15 +106,15 @@ class WideResNet(nn.Module):
         self.layer_one_out = out
         self.layer_one_out.requires_grad_()
         self.layer_one_out.retain_grad()
-        out = self.block1(out)
-        out = self.block2(out)
-        out = self.block3(out)
+        h2 = out = self.block1(out)
+        h3 = out = self.block2(out)
+        h4 = out = self.block3(out)
         out = self.relu(self.bn1(out))
         out = F.avg_pool2d(out, 8)
         out = out.view(-1, self.nChannels)
 
         y = self.fc(out)
-        return y
+        return self.layer_one_out, h2, h3, h4, y
 
 
 def create_network():

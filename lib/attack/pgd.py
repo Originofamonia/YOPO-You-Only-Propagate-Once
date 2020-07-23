@@ -60,13 +60,13 @@ class IPGD(AttackBase):
 
         # net.zero_grad()
 
-        pred = net(adv_inp)
+        h1, h2, h3, h4, y = net(adv_inp)
         if target is not None:
-            targets = torch.sum(pred[:, target])
+            targets = torch.sum(y[:, target])
             grad_sign = torch.autograd.grad(targets, adv_inp, only_inputs=True, retain_graph=False)[0].sign()
 
         else:
-            loss = self.criterion(pred, label)
+            loss = self.criterion(y, label)
             grad_sign = torch.autograd.grad(loss, adv_inp,
                                             only_inputs=True, retain_graph=False)[0].sign()
 

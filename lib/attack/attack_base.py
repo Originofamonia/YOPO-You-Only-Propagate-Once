@@ -7,7 +7,6 @@ class AttackBase(metaclass=ABCMeta):
     @abstractmethod
     def attack(self, net, inp, label, target=None):
         """
-
         :param inp: batched images
         :param target: specify the indexes of target class, None represents untargeted attack
         :return: batched adversaril images
