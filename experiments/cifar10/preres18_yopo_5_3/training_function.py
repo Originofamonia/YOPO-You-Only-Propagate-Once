@@ -1,19 +1,18 @@
-import torch
-import torch.nn as nn
-from config import config
-
-from loss import Hamiltonian, cal_l2_norm
-
-from utils.misc import torch_accuracy, AvgMeter
+# import torch
+# import torch.nn as nn
 from collections import OrderedDict
 import torch
 from tqdm import tqdm
+
+from experiments.cifar10.preres18_yopo_5_3.config import config
+# from experiments.cifar10.preres18_yopo_5_3.loss import Hamiltonian, cal_l2_norm
+from lib.utils.misc import torch_accuracy, AvgMeter
 
 
 class FastGradientLayerOneTrainer(object):
 
     def __init__(self, Hamiltonian_func, param_optimizer,
-                    inner_steps=2, sigma = 0.008, eps = 0.03):
+                 inner_steps=2, sigma=0.008, eps=0.03):
         self.inner_steps = inner_steps
         self.sigma = sigma
         self.eps = eps
@@ -21,11 +20,11 @@ class FastGradientLayerOneTrainer(object):
         self.param_optimizer = param_optimizer
 
     def step(self, inp, p, eta):
-        '''
+        """
         Perform Iterative Sign Gradient on eta
 
         ret: inp + eta
-        '''
+        """
 
         p = p.detach()
 
@@ -44,7 +43,7 @@ class FastGradientLayerOneTrainer(object):
             eta.requires_grad_()
             eta.retain_grad()
 
-        #self.param_optimizer.zero_grad()
+        # self.param_optimizer.zero_grad()
 
         yofo_inp = eta + inp
         yofo_inp = torch.clamp(yofo_inp, 0, 1)
@@ -52,32 +51,29 @@ class FastGradientLayerOneTrainer(object):
         loss = -1.0 * self.Hamiltonian_func(yofo_inp, p)
 
         loss.backward()
-        #self.param_optimizer.step()
-        #self.param_optimizer.zero_grad()
+        # self.param_optimizer.step()
+        # self.param_optimizer.zero_grad()
 
         return yofo_inp, eta
 
 
-
-
 def train_one_epoch(net, batch_generator, optimizer,
                     criterion, LayerOneTrainner, K,
-                    DEVICE=torch.device('cuda:0'),descrip_str='Training'):
-    '''
-
+                    device='cuda:0', descr_str='Training'):
+    """
     :param attack_freq:  Frequencies of training with adversarial examples. -1 indicates natural training
     :param AttackMethod: the attack method, None represents natural training
     :return:  None    #(clean_acc, adv_acc)
-    '''
+    """
     net.train()
     pbar = tqdm(batch_generator)
     yofoacc = -1
     cleanacc = -1
     cleanloss = -1
-    pbar.set_description(descrip_str)
+    pbar.set_description(descr_str)
     for i, (data, label) in enumerate(pbar):
-        data = data.to(DEVICE)
-        label = label.to(DEVICE)
+        data = data.to(device)
+        label = label.to(device)
 
         eta = torch.FloatTensor(*data.shape).uniform_(-config.eps, config.eps)
         eta = eta.to(label.device)
@@ -87,7 +83,7 @@ def train_one_epoch(net, batch_generator, optimizer,
         LayerOneTrainner.param_optimizer.zero_grad()
 
         for j in range(K):
-            #optimizer.zero_grad()
+            # optimizer.zero_grad()
 
             pbar_dic = OrderedDict()
             TotalLoss = 0
@@ -96,16 +92,16 @@ def train_one_epoch(net, batch_generator, optimizer,
 
             loss = criterion(pred, label)
             TotalLoss = TotalLoss + loss
-#             wgrad = net.conv1.weight.grad
-            #bgrad = net.conv1.bias.grad
+            #             wgrad = net.conv1.weight.grad
+            # bgrad = net.conv1.bias.grad
             TotalLoss.backward()
-#             net.conv1.weight.grad = wgrad
-            #net.conv1.bias.grad = bgrad
-            #param = next(net.parameters())
-            #grad_mean = torch.mean(param.grad)
+            #             net.conv1.weight.grad = wgrad
+            # net.conv1.bias.grad = bgrad
+            # param = next(net.parameters())
+            # grad_mean = torch.mean(param.grad)
 
-            #optimizer.step()
-            #optimizer.zero_grad()
+            # optimizer.step()
+            # optimizer.zero_grad()
 
             p = -1.0 * net.layer_one_out.grad
             yofo_inp, eta = LayerOneTrainner.step(data, p, eta)
@@ -119,7 +115,7 @@ def train_one_epoch(net, batch_generator, optimizer,
                 if j == K - 1:
                     yofo_pred = net(yofo_inp)
                     yofoacc = torch_accuracy(yofo_pred, label, (1,))[0].item()
-            #pbar_dic['grad'] = '{}'.format(grad_mean)
+            # pbar_dic['grad'] = '{}'.format(grad_mean)
 
         optimizer.step()
         LayerOneTrainner.param_optimizer.step()
@@ -131,4 +127,3 @@ def train_one_epoch(net, batch_generator, optimizer,
         pbar.set_postfix(pbar_dic)
 
     return cleanacc, yofoacc
-

@@ -17,7 +17,7 @@ root_path = os.path.join('/', *abs_current_path.split(os.path.sep)[:-3])
 lib_dir = os.path.join(root_path, 'lib')
 add_path(lib_dir)
 
-from training.config import TrainingConfigBase, SGDOptimizerMaker, \
+from lib.training.config import TrainingConfigBase, SGDOptimizerMaker, \
     PieceWiseConstantLrSchedulerMaker, IPGDAttackMethodMaker
 
 
@@ -46,7 +46,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument('--resume', default=None, type=str, metavar='PATH',
                     help='path to latest checkpoint (default: none)')
-parser.add_argument('-b', '--batch_size', default=100, type=int,
+parser.add_argument('-b', '--batch_size', default=200, type=int,
                     metavar='N', help='mini-batch size')
 parser.add_argument('-d', type=int, default=0, help='Which gpu to use')
 parser.add_argument('-adv_coef', default=1.0, type=float,
