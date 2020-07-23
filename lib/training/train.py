@@ -182,8 +182,8 @@ def eval_one_epoch(net, batch_generator, device, attack_method=None):
             adv_inp = attack_method.attack(net, data, label)
 
             with torch.no_grad():
-                y = net(adv_inp)
-                acc = torch_accuracy(y, label, (1,))
+                h1a, h2a, h3a, h4a, ya = net(adv_inp)
+                acc = torch_accuracy(ya, label, (1,))
                 adv_accuracy.update(acc[0].item())
 
         pbar_dic = OrderedDict()
