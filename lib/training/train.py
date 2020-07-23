@@ -8,7 +8,6 @@ import torch.nn as nn
 from tqdm import tqdm
 
 father_dir = os.path.join('/', *os.path.realpath(__file__).split(os.path.sep)[:-2])
-# print(father_dir)
 if father_dir not in sys.path:
     sys.path.append(father_dir)
 
@@ -16,8 +15,6 @@ if father_dir not in sys.path:
 def train_one_epoch(net, batch_generator, optimizer, criterion, device,
                     descr_str='Training', attack_method=None, adv_coef=1.0):
     """
-    :param attack_freq:  Frequencies of training with adversarial examples. -1 indicates natural training
-    :param attack_method: the attack method, None represents natural training
     :return: clean_acc, adv_acc
     """
     net.train()
@@ -99,8 +96,6 @@ def train_hloss(net, batch_generator, optimizer, criterion, device,
 
             acc = torch_accuracy(ya, label, (1,))
             advacc = acc[0].item()
-            # advloss = xent_loss.item()
-            # (xent_loss * adv_coef).backward()
 
         h1, h2, h3, h4, y = net(data)
 
@@ -114,6 +109,53 @@ def train_hloss(net, batch_generator, optimizer, criterion, device,
 
         pbar_dic['Acc'] = '{:.2f}'.format(cleanacc)
         pbar_dic['hloss'] = '{:.2f}'.format(h_loss)
+        pbar_dic['AdvAcc'] = '{:.2f}'.format(advacc)
+        pbar_dic['xentloss'] = '{:.2f}'.format(xent_loss)
+        pbar.set_postfix(pbar_dic)
+
+    return cleanacc, advacc
+
+
+def train_mi(net, net2, batch_generator, optimizer, criterion, device,
+             descr_str='Training', attack_method=None, adv_coef=1.0):
+    """
+    :return: clean_acc, adv_acc
+    """
+    net.train()
+    pbar = tqdm(batch_generator)
+    advacc = -1
+    # advloss = -1
+    cleanacc = -1
+    hloss_criterion = nn.MSELoss()
+    pbar.set_description(descr_str)
+    for i, (data, label) in enumerate(pbar):
+        data, label = data.to(device), label.to(device)
+
+        optimizer.zero_grad()
+        pbar_dic = OrderedDict()
+
+        if attack_method is not None:
+            adv_inp = attack_method.attack(net, data, label)
+            optimizer.zero_grad()
+            net.train()
+            h1a, h2a, h3a, h4a, ya = net(adv_inp)
+            xent_loss = criterion(ya, label)
+            h1_prime = torch.cat((h1a[1:], h1a[0].unsqueeze(0)), dim=0)
+            mi_loss = net2(h4a, h1a, h1_prime)
+            acc = torch_accuracy(ya, label, (1,))
+            advacc = acc[0].item()
+
+        h1, h2, h3, h4, y = net(data)
+
+        loss = mi_loss * adv_coef + xent_loss
+        loss.backward()
+
+        optimizer.step()
+        acc = torch_accuracy(y, label, (1,))
+        cleanacc = acc[0].item()
+
+        pbar_dic['Acc'] = '{:.2f}'.format(cleanacc)
+        pbar_dic['miloss'] = '{:.2f}'.format(mi_loss)
         pbar_dic['AdvAcc'] = '{:.2f}'.format(advacc)
         pbar_dic['xentloss'] = '{:.2f}'.format(xent_loss)
         pbar.set_postfix(pbar_dic)

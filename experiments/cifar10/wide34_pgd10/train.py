@@ -54,8 +54,8 @@ def main():
 
     for i in range(now_epoch, config.num_epochs):
 
-        descr_str = 'Training epoch:{}/{} -- lr:{}'.format(i, config.num_epochs,
-                                                           lr_scheduler.get_last_lr()[0])
+        descr_str = 'Epoch:{}/{} -- lr:{}'.format(i, config.num_epochs,
+                                                  lr_scheduler.get_last_lr()[0])
         cleanacc, advacc = train_one_epoch(net, ds_train, optimizer, criterion, device,
                                            descr_str, train_attack, adv_coef=args.adv_coef)
         tb_train_dic = {'Acc': cleanacc, 'YofoAcc': advacc}

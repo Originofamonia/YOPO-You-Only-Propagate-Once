@@ -3,7 +3,6 @@ import sys
 # import time
 # import numpy as np
 # import argparse
-
 import os
 
 
@@ -23,10 +22,10 @@ add_path(root_path)
 
 from experiments.cifar10.wide34_pgd10.config import config, args
 from experiments.dataset import create_train_dataset, create_test_dataset
-from experiments.cifar10.wide34_pgd10.network import create_network
+from experiments.cifar10.wide34_pgd10.network import create_network, DeepInfoMaxLoss
 
 from lib.utils.misc import save_args, save_checkpoint, load_checkpoint
-from lib.training.train import train_one_epoch, train_hloss, eval_one_epoch
+from lib.training.train import train_one_epoch, train_hloss, train_mi, eval_one_epoch
 
 
 def main():
@@ -34,7 +33,9 @@ def main():
     torch.backends.cudnn.benchmark = True
 
     net = create_network()
+    net2 = DeepInfoMaxLoss()
     net.to(device)
+    net2.to(device)
     criterion = config.create_loss_function().to(device)
 
     optimizer = config.create_optimizer(net.parameters())
@@ -57,8 +58,8 @@ def main():
 
         descr_str = 'Epoch:{}/{} -- lr:{}'.format(i, config.num_epochs,
                                                   lr_scheduler.get_last_lr()[0])
-        cleanacc, advacc = train_hloss(net, ds_train, optimizer, criterion, device,
-                                       descr_str, train_attack, adv_coef=args.adv_coef)
+        cleanacc, advacc = train_mi(net, net2, ds_train, optimizer, criterion, device,
+                                    descr_str, train_attack, adv_coef=args.adv_coef)
         tb_train_dic = {'Acc': cleanacc, 'YofoAcc': advacc}
         print('Train: {}'.format(tb_train_dic))
 
