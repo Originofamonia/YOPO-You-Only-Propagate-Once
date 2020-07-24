@@ -68,6 +68,19 @@ def train_one_epoch(net, batch_generator, optimizer, criterion, device,
     return cleanacc, advacc
 
 
+def kl_div_loss(logits_q, logits_p, T):
+    assert logits_p.size() == logits_q.size()
+    logits_q = logits_q.view(logits_q.size()[0], -1)
+    logits_p = logits_p.view(logits_p.size()[0], -1)
+    b, c = logits_p.size()
+    p = nn.Softmax(dim=1)(logits_p / T)
+    q = nn.Softmax(dim=1)(logits_q / T)
+    epsilon = 1e-8
+    _p = (p + epsilon * torch.ones(b, c).cuda()) / (1.0 + c * epsilon)
+    _q = (q + epsilon * torch.ones(b, c).cuda()) / (1.0 + c * epsilon)
+    return (T ** 2) * torch.mean(torch.sum(_p * torch.log(_p / _q), dim=1))
+
+
 def train_hloss(net, batch_generator, optimizer, criterion, device,
                 descr_str='Training', attack_method=None, adv_coef=1.0):
     """
@@ -99,7 +112,8 @@ def train_hloss(net, batch_generator, optimizer, criterion, device,
 
         h1, h2, h3, h4, y = net(data)
 
-        h_loss = hloss_criterion(h4a, h4)
+        # h_loss = hloss_criterion(h4a, h4)
+        h_loss = kl_div_loss(h4a, h4.detach(), 1)
         loss = h_loss * adv_coef + xent_loss
         loss.backward()
 
