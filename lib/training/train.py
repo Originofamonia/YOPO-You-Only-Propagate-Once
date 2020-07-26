@@ -91,7 +91,7 @@ def train_hloss(net, batch_generator, optimizer, criterion, device,
     advacc = -1
     advloss = -1
     cleanacc = -1
-    hloss_criterion = nn.MSELoss()
+    mse_criterion = nn.MSELoss()
     pbar.set_description(descr_str)
     for i, (data, label) in enumerate(pbar):
         data, label = data.to(device), label.to(device)
@@ -112,8 +112,8 @@ def train_hloss(net, batch_generator, optimizer, criterion, device,
 
         h1, h2, h3, h4, y = net(data)
 
-        # h_loss = hloss_criterion(h4a, h4)
-        h_loss = kl_div_loss(h4a, h4.detach(), 1)
+        h_loss = mse_criterion(h4a, h4)
+        # h_loss = kl_div_loss(h4a, h4.detach(), 1)
         loss = h_loss * adv_coef + xent_loss
         loss.backward()
 
@@ -140,7 +140,6 @@ def train_mi(net, net2, batch_generator, optimizer, criterion, device,
     advacc = -1
     # advloss = -1
     cleanacc = -1
-    hloss_criterion = nn.MSELoss()
     pbar.set_description(descr_str)
     for i, (data, label) in enumerate(pbar):
         data, label = data.to(device), label.to(device)
