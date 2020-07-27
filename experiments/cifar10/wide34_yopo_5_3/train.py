@@ -49,7 +49,7 @@ def main():
     layer_1_optimizer = optim.SGD(net.layer_one.parameters(), lr=lr_scheduler.get_last_lr()[0], momentum=0.9,
                                   weight_decay=5e-4)
     layer_1_optimizer_lr_scheduler = optim.lr_scheduler.MultiStepLR(layer_1_optimizer,
-                                                                    milestones=[55, 75, 95], gamma=0.1)
+                                                                    milestones=[10, 20, 30], gamma=0.1)
     layer_1_trainer = FastGradientLayerOneTrainer(hamiltonian_func, layer_1_optimizer,
                                                   config.inner_iters, config.sigma, config.eps)
 

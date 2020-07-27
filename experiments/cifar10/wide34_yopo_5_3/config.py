@@ -26,7 +26,7 @@ class TrainingConfig(TrainingConfigBase):
     eps = 8 / 255.0
 
     create_optimizer = SGDOptimizerMaker(lr=1e-1 * 4 / K, momentum=0.9, weight_decay=5e-4)
-    create_lr_scheduler = PieceWiseConstantLrSchedulerMaker(milestones=[12, 24, 30], gamma=1e-1)
+    create_lr_scheduler = PieceWiseConstantLrSchedulerMaker(milestones=[10, 20, 30], gamma=1e-1)
 
     create_loss_function = nn.CrossEntropyLoss
 

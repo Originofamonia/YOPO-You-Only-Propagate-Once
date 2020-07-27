@@ -58,7 +58,6 @@ class FastGradientLayerOneTrainer(object):
 def train_one_epoch(net, batch_generator, optimizer, criterion, LayerOneTrainer, K,
                     device, descr_str='Training'):
     """
-
     :return: clean_acc, adv_acc
     """
     net.train()
@@ -83,9 +82,9 @@ def train_one_epoch(net, batch_generator, optimizer, criterion, LayerOneTrainer,
             pbar_dic = OrderedDict()
             TotalLoss = 0
 
-            pred = net(data + eta.detach())
+            h1, h2, h3, h4, y = net(data + eta.detach())
 
-            loss = criterion(pred, label)
+            loss = criterion(y, label)
             TotalLoss = TotalLoss + loss
             wgrad = net.conv1.weight.grad
             # bgrad = net.conv1.bias.grad
@@ -103,13 +102,13 @@ def train_one_epoch(net, batch_generator, optimizer, criterion, LayerOneTrainer,
 
             with torch.no_grad():
                 if j == 0:
-                    acc = torch_accuracy(pred, label, (1,))
+                    acc = torch_accuracy(y, label, (1,))
                     cleanacc = acc[0].item()
                     cleanloss = loss.item()
 
                 if j == K - 1:
-                    yofo_pred = net(yofo_inp)
-                    yofoacc = torch_accuracy(yofo_pred, label, (1,))[0].item()
+                    h1, h2, h3, h4, y = net(yofo_inp)
+                    yofoacc = torch_accuracy(y, label, (1,))[0].item()
             # pbar_dic['grad'] = '{}'.format(grad_mean)
 
         optimizer.step()
