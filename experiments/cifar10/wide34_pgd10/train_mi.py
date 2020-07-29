@@ -1,6 +1,6 @@
 import torch
 import sys
-# import time
+import torch.nn as nn
 # import numpy as np
 # import argparse
 import os
@@ -34,6 +34,12 @@ def main():
 
     net = create_network()
     net2 = DeepInfoMaxLoss()
+
+    if torch.cuda.device_count() > 1:
+        print('Let''s use {} GPUs!'.format(torch.cuda.device_count()))
+        net = nn.DataParallel(net)
+        net2 = nn.DataParallel(net2)
+
     net.to(device)
     net2.to(device)
     criterion = config.create_loss_function().to(device)
