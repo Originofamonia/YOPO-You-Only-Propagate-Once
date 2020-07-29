@@ -52,11 +52,26 @@ class LocalD(nn.Module):
         return self.c2(hidden)
 
 
+class PriorD(nn.Module):
+    def __init__(self, in_channel):
+        super(PriorD, self).__init__()
+        self.l0 = nn.Linear(in_channel, 1000)
+        self.l1 = nn.Linear(1000, 200)
+        self.l2 = nn.Linear(200, 1)
+
+    def forward(self, x):
+        x = x.view(-1, 40960)
+        h = F.relu(self.l0(x))
+        h = F.relu(self.l1(h))
+        return torch.sigmoid(self.l2(h))
+
+
 class DeepInfoMaxLoss(nn.Module):
     def __init__(self, alpha=0.5, beta=1.0, gamma=0.1):
         super(DeepInfoMaxLoss, self).__init__()
         self.global_d = GlobalD(640, 16)  # in_channel (y, M)
         self.local_d = LocalD(656)  # in_channel (h_cat)
+        self.prior_d = PriorD(40960)  # in_channel (y)
         self.alpha = alpha
         self.beta = beta
         self.gamma = gamma
@@ -74,7 +89,13 @@ class DeepInfoMaxLoss(nn.Module):
         Em = F.softplus(self.global_d(h4, h1_prime)).mean()
         _global = (Em - Ej) * self.alpha
 
-        return _local + _global
+        prior = torch.rand_like(h4)
+
+        term_a = torch.log(self.prior_d(prior)).mean()
+        term_b = torch.log(1.0 - self.prior_d(h4)).mean()
+        _prior = - (term_a + term_b) * self.gamma
+
+        return _local + _global + _prior
 
 
 def create_network():
