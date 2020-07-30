@@ -37,7 +37,7 @@ def main():
     net2 = DeepInfoMaxLoss()
 
     if torch.cuda.device_count() > 1:
-        print('Let''s use {} GPUs!'.format(torch.cuda.device_count()))
+        print('Let\'s use {} GPUs!'.format(torch.cuda.device_count()))
         net = nn.DataParallel(net)
         net2 = nn.DataParallel(net2)
 

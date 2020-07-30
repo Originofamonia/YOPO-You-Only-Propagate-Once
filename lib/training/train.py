@@ -161,7 +161,7 @@ def train_mi(net, net2, batch_generator, optimizer, criterion, device,
         h1, h2, h3, h4, y = net(data)
 
         loss = mi_loss * adv_coef + xent_loss
-        loss.backward()
+        loss.sum().backward()
 
         optimizer.step()
         acc = torch_accuracy(y, label, (1,))
