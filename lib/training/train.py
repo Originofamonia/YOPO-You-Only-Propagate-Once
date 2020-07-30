@@ -168,9 +168,9 @@ def train_mi(net, net2, batch_generator, optimizer, criterion, device,
         cleanacc = acc[0].item()
 
         pbar_dic['Acc'] = '{:.2f}'.format(cleanacc)
-        pbar_dic['miloss'] = '{:.2f}'.format(mi_loss)
+        pbar_dic['miloss'] = '{:.2f}'.format(mi_loss.item())
         pbar_dic['AdvAcc'] = '{:.2f}'.format(advacc)
-        pbar_dic['xentloss'] = '{:.2f}'.format(xent_loss)
+        pbar_dic['xentloss'] = '{:.2f}'.format(xent_loss.item())
         pbar.set_postfix(pbar_dic)
 
     return cleanacc, advacc
