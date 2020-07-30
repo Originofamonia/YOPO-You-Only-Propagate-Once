@@ -89,7 +89,6 @@ def train_hloss(net, batch_generator, optimizer, criterion, device,
     net.train()
     pbar = tqdm(batch_generator)
     advacc = -1
-    advloss = -1
     cleanacc = -1
     mse_criterion = nn.MSELoss()
     pbar.set_description(descr_str)
@@ -115,16 +114,16 @@ def train_hloss(net, batch_generator, optimizer, criterion, device,
         h_loss = mse_criterion(h4a, h4)
         # h_loss = kl_div_loss(h4a, h4.detach(), 1)
         loss = h_loss * adv_coef + xent_loss
-        loss.backward()
+        loss.sum().backward()
 
         optimizer.step()
         acc = torch_accuracy(y, label, (1,))
         cleanacc = acc[0].item()
 
         pbar_dic['Acc'] = '{:.2f}'.format(cleanacc)
-        pbar_dic['hloss'] = '{:.2f}'.format(h_loss)
+        pbar_dic['hloss'] = '{:.2f}'.format(h_loss.item())
         pbar_dic['AdvAcc'] = '{:.2f}'.format(advacc)
-        pbar_dic['xentloss'] = '{:.2f}'.format(xent_loss)
+        pbar_dic['xentloss'] = '{:.2f}'.format(xent_loss.item())
         pbar.set_postfix(pbar_dic)
 
     return cleanacc, advacc
@@ -138,7 +137,6 @@ def train_mi(net, net2, batch_generator, optimizer, criterion, device,
     net.train()
     pbar = tqdm(batch_generator)
     advacc = -1
-    # advloss = -1
     cleanacc = -1
     pbar.set_description(descr_str)
     for i, (data, label) in enumerate(pbar):
@@ -160,7 +158,7 @@ def train_mi(net, net2, batch_generator, optimizer, criterion, device,
 
         h1, h2, h3, h4, y = net(data)
 
-        loss = mi_loss * adv_coef + xent_loss
+        loss = mi_loss.sum() * adv_coef + xent_loss.sum()
         loss.sum().backward()
 
         optimizer.step()
@@ -168,9 +166,9 @@ def train_mi(net, net2, batch_generator, optimizer, criterion, device,
         cleanacc = acc[0].item()
 
         pbar_dic['Acc'] = '{:.2f}'.format(cleanacc)
-        pbar_dic['miloss'] = '{:.2f}'.format(mi_loss.item())
+        pbar_dic['miloss'] = '{:.2f}'.format(mi_loss.sum().item())
         pbar_dic['AdvAcc'] = '{:.2f}'.format(advacc)
-        pbar_dic['xentloss'] = '{:.2f}'.format(xent_loss.item())
+        pbar_dic['xentloss'] = '{:.2f}'.format(xent_loss.sum().item())
         pbar.set_postfix(pbar_dic)
 
     return cleanacc, advacc
