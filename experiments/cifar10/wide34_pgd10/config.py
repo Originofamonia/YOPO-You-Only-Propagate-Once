@@ -18,7 +18,7 @@ class TrainingConfig(TrainingConfigBase):
     eval_interval = 15
 
     create_optimizer = SGDOptimizerMaker(lr=1e-1, momentum=0.9, weight_decay=2e-4)
-    create_lr_scheduler = PieceWiseConstantLrSchedulerMaker(milestones=[40, 65, 90], gamma=0.1)
+    create_lr_scheduler = PieceWiseConstantLrSchedulerMaker(milestones=[60, 80, 100], gamma=0.1)
 
     create_loss_function = torch.nn.CrossEntropyLoss
 
