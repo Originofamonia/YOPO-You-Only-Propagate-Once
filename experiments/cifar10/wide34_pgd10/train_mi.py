@@ -29,7 +29,8 @@ from lib.training.train import train_one_epoch, train_hloss, train_mi, eval_one_
 
 
 def main():
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    # device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     torch.backends.cudnn.benchmark = True
 
     net = create_network()
