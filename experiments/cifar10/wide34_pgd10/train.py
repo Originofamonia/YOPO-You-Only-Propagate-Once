@@ -69,7 +69,7 @@ def main():
         lr_scheduler.step()
 
     save_checkpoint(i, net, optimizer, lr_scheduler,
-                    file_name=os.path.join(config.model_dir, 'epoch-{}.checkpoint'.format(i)))
+                    file_name=os.path.join(config.model_dir, 'advtrain.{}'.format(i)))
     acc, advacc = eval_one_epoch(net, ds_val, device, eval_attack)
     tb_val_dic = {'Acc': acc, 'AdvAcc': advacc}
     print('Eval: {}'.format(tb_val_dic))
