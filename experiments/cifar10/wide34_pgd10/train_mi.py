@@ -82,6 +82,9 @@ def main():
     acc, advacc = eval_one_epoch(net, ds_eval, device, eval_attack)
     tb_val_dic = {'Acc': acc, 'AdvAcc': advacc}
     print('Eval: {}'.format(tb_val_dic))
+    file1 = open(os.path.join(config.model_dir, 'mi_results.txt'), 'w')
+    file1.write('MI Eval: {}'.format(tb_val_dic))
+    file1.close()
 
 
 if __name__ == '__main__':

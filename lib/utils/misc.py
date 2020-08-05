@@ -84,9 +84,9 @@ def save_checkpoint(now_epoch, net, optimizer, lr_scheduler, file_name):
     if os.path.exists(file_name):
         print('Overwriting {}'.format(file_name))
     torch.save(checkpoint, file_name)
-    link_name = os.path.join('/', *file_name.split(os.path.sep)[:-1], 'last.checkpoint')
+    # link_name = os.path.join('/', *file_name.split(os.path.sep)[:-1], 'last.checkpoint')
     # print(link_name)
-    make_symlink(source=file_name, link_name=link_name)
+    # make_symlink(source=file_name, link_name=link_name)
 
 
 def load_checkpoint(file_name, net=None, optimizer=None, lr_scheduler=None):

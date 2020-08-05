@@ -46,7 +46,10 @@ def main():
 
     print('Evaluating')
     clean_acc, adv_acc = eval_one_epoch(net, ds_val, device, attack_method)
-    print('clean acc -- {}     adv acc -- {}'.format(clean_acc, adv_acc))
+    print('clean acc: {}, adv acc: {}'.format(clean_acc, adv_acc))
+    file1 = open(os.path.join(config.model_dir, 'mi_eval_results.txt'), 'w')
+    file1.write('MI Eval, clean acc: {}, adv acc: {}'.format(clean_acc, adv_acc))
+    file1.close()
 
 
 if __name__ == '__main__':
