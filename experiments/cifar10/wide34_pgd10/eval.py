@@ -1,6 +1,6 @@
 import argparse
 import torch
-# import numpy as np
+import torch.nn as nn
 import os
 import sys
 
@@ -35,6 +35,10 @@ def main():
     torch.backends.cudnn.benchmark = True
 
     net = create_network()
+    if torch.cuda.device_count() > 1:
+        print('Let\'s use {} GPUs!'.format(torch.cuda.device_count()))
+        net = nn.DataParallel(net)
+
     net.to(device)
 
     ds_val = create_test_dataset()
