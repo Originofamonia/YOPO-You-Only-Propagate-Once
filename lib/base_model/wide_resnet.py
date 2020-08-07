@@ -119,7 +119,6 @@ class WideResNet(nn.Module):
 
 def create_network():
     net = WideResNet()
-
     return net
 
 
