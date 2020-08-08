@@ -21,7 +21,7 @@ from experiments.dataset import create_test_dataset
 from experiments.cifar10.wide34_pgd10.network import create_network
 
 from lib.training.train import eval_one_epoch
-from lib.utils.misc import load_checkpoint
+from lib.utils.misc import load_checkpoint, save_checkpoint
 
 
 def main():

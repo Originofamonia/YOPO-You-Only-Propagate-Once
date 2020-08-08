@@ -99,7 +99,7 @@ class DeepInfoMaxLoss(nn.Module):
 
 
 def create_network():
-    return WideResNet()
+    return WideResNet(34)
 
 
 def test():
