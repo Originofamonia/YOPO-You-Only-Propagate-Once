@@ -30,7 +30,7 @@ def train_one_epoch(net, batch_generator, optimizer, criterion, device,
         optimizer.zero_grad()
 
         pbar_dic = OrderedDict()
-        TotalLoss = 0
+        # TotalLoss = 0
 
         if attack_method is not None:
             adv_inp = attack_method.attack(net, data, label)
